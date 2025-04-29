@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">App_DocSach</string>
+    <string name="keep_readin">Keep reading,</string>
+    <string name="you_ll_fall">
+            "You'll fall in love"
+        </string>
+    <string name="m_t_th_vi_n">
+    Một thư viện sách điện tử dành cho doanh nghiệp có quy mô vừa phải về các kỹ năng mềm và quyền truy cập vào hơn 30 triệu cuốn sách bằng nhiều ngôn ngữ khác nhau với đăng ký hàng tháng dễ dàng và đơn giản cũng như đọc ở mọi nơi, mọi thiết bị.
+    </string>
+    <string name="b_t_u_c_n_o">
+           "Bắt đầu đọc nào!"
+        </string>
+    <string name="t_n_ng_nh_p">
+           "Tên đăng nhập"
+        </string>
+    <string name="matkhau">
+           "Mật khẩu"
+        </string>
+</resources>

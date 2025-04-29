@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="keep_readin">
+        <item name="fontFamily">Work Sans</item>
+        <item name="android:textSize">34sp</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+    <style name="you_ll_fall">
+        <item name="fontFamily">Work Sans</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+    <style name="m_t_th_vi_n">
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+    <style name="b_t_u_c_n_o">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+    <style name="t_n_ng_nh_p">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+    <style name="dangnhap">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#ffffff</item>
+    </style>
+</resources>
