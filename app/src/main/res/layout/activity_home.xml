@@ -55,13 +55,13 @@
 
         <!-- Sách của tôi -->
         <LinearLayout
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp">
+
             <TextView
-                android:layout_width="120dp"
-                android:layout_height="27dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Sách của tôi"
                 android:textSize="20dp"
                 android:textStyle="bold" />
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:text="Xem tất cả"
-                android:gravity="right"
+                android:gravity="end"
                 android:paddingRight="5dp"/>
         </LinearLayout>
 
@@ -80,78 +80,105 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
-            android:layout_marginStart="12dp">
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:overScrollMode="never"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Các nút có cùng minWidth và bo góc nếu cần -->
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="100dp"
+                    android:text="Hài hước"
+                    android:gravity="center"
+                    android:background="@drawable/bg_button_genre"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="100dp"
+                    android:text="Kinh dị"
+                    android:gravity="center"
+                    android:background="@drawable/bg_button_genre"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="100dp"
+                    android:text="Thiếu nhi"
+                    android:gravity="center"
+                    android:background="@drawable/bg_button_genre"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="100dp"
+                    android:text="Học tập"
+                    android:gravity="center"
+                    android:background="@drawable/bg_button_genre"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="100dp"
+                    android:text="Khoa học"
+                    android:gravity="center"
+                    android:background="@drawable/bg_button_genre"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="100dp"
+                    android:text="Tâm lý xã hội"
+                    android:gravity="center"
+                    android:background="@drawable/bg_button_genre"
+                    android:layout_marginEnd="8dp"/>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Danh sách sách của tôi -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingEnd="12dp">
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hài hước"
-                    android:textSize="15sp"
-                    android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Kinh dị"
-                    android:textSize="15sp"
-                    android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Thiếu nhi"
-                    android:textSize="15sp"
-                    android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Học tập"
-                    android:textSize="15sp"
-                    android:layout_marginEnd="8dp" />
-
-                <!-- Nút test -->
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Khoa học"
-                    android:textSize="15sp"
-                    android:layout_marginEnd="8dp" />
-
-            </LinearLayout>
-        </HorizontalScrollView>
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:paddingHorizontal="12dp">
 
                 <include layout="@layout/item_book" />
                 <include layout="@layout/item_book" />
+                <include layout="@layout/item_book" />
 
+                <!-- Nút thêm -->
                 <FrameLayout
                     android:layout_width="80dp"
-                    android:layout_height="146dp">
+                    android:layout_height="146dp"
+                    android:background="@drawable/bg_item_book"
+                   >
 
                     <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="#FFFFFF"
-                        android:src="@drawable/dang_nhap" />
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/add_ic"
+                        android:layout_gravity="center"
+                         />
                 </FrameLayout>
             </LinearLayout>
         </HorizontalScrollView>
-
 
         <!-- Đọc tiếp -->
         <TextView
@@ -164,12 +191,14 @@
 
         <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp">
 
                 <include layout="@layout/item_book" />
                 <include layout="@layout/item_book" />
@@ -187,7 +216,8 @@
 
         <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp">
 
             <LinearLayout
                 android:orientation="horizontal"
