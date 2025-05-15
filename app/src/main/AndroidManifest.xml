@@ -13,6 +13,12 @@
         android:theme="@style/Theme.Design.Light.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".view.activity.AddEditBookActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activity.SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.activity.HomeActivity"
             android:exported="false" />
         <activity

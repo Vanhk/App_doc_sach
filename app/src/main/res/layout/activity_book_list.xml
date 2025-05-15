@@ -35,7 +35,8 @@
             android:padding="6dp"
             android:src="@drawable/ic_add"
             android:background="@drawable/bg_circle_blue"
-            android:contentDescription="Thêm sách" />
+            android:contentDescription="Thêm sách"
+            android:visibility="visible"/>
     </LinearLayout>
 
     <!-- Bộ lọc -->
@@ -49,17 +50,32 @@
         <Spinner
             android:id="@+id/spinnerCategory"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="35dp"
+            android:layout_height="48dp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/spinner_background"/>
+            android:layout_weight="1"
+            android:background="@drawable/spinner_background" />
 
         <Spinner
             android:id="@+id/spinnerGenre"
             android:layout_width="0dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:layout_height="35dp"
-            android:background="@drawable/spinner_background"/>
+            android:background="@drawable/spinner_background" />
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="334dp"
+            android:layout_height="54dp"
+            android:hint="  Search by title, author, genre"
+            android:drawableLeft="@drawable/search_ic"
+            android:paddingStart="12dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:layout_margin="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <!-- Kết quả -->

@@ -52,7 +52,7 @@
             android:background="@drawable/bg_icon_circle"
             android:contentDescription="Yêu thích"
             android:padding="2dp"
-            android:src="@drawable/icon_ionic_ios_bookmark"
+            android:src="@drawable/baseline_bookmark_24"
             android:visibility="gone" />
     </FrameLayout>
 

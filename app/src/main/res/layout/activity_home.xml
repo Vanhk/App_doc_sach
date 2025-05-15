@@ -59,7 +59,8 @@
             android:layout_margin="12dp"
             android:background="@drawable/bg_search_bar"
             android:gravity="center_vertical"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            />
 
         <!-- Sách của tôi -->
         <LinearLayout
