@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.activity.LoginActivity">
+    tools:context=".view.activity.RegisterActivity">
 
     <View
         android:id="@+id/image_2023_"
@@ -55,6 +55,41 @@
         app:layout_constraintTop_toBottomOf="@+id/image_2023_" />
 
     <TextView
+        android:id="@+id/txtemail"
+        android:layout_width="wrap_content"
+        android:layout_height="23dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="20dp"
+        android:gravity="top"
+        android:lineSpacingExtra="-4sp"
+        android:text="Nhập email, SĐT"
+        android:textAppearance="@style/t_n_ng_nh_p"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/edtemail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/edtemail"
+        app:layout_constraintTop_toBottomOf="@+id/image_2023_"
+        app:layout_constraintVertical_bias="0.926" />
+
+    <EditText
+        android:id="@+id/edtemail"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="44dp"
+        android:background="@drawable/edittext_background"
+        android:ems="10"
+        android:hint="Email, SĐT"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtTen_dang_nhap" />
+
+    <TextView
         android:id="@+id/txtmatkhau"
         android:layout_width="wrap_content"
         android:layout_height="23dp"
@@ -64,7 +99,7 @@
         android:layout_marginTop="20dp"
         android:gravity="top"
         android:lineSpacingExtra="-4sp"
-        android:text="@string/matkhau"
+        android:text="Nhập mật khẩu"
         android:textAppearance="@style/t_n_ng_nh_p"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -73,7 +108,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/edtmatkhau"
         app:layout_constraintTop_toBottomOf="@+id/image_2023_"
-        app:layout_constraintVertical_bias="0.926" />
+        app:layout_constraintVertical_bias="0.946" />
 
     <EditText
         android:id="@+id/edtmatkhau"
@@ -87,55 +122,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTen_dang_nhap" />
+        app:layout_constraintTop_toBottomOf="@+id/edtemail" />
+
 
     <Button
-        android:id="@+id/btndang_nhap"
+        android:id="@+id/btndang_ky"
+        style="@style/dangnhap"
         android:layout_width="145dp"
         android:layout_height="69dp"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/blue"
-        android:background="@drawable/rounded_button"
-        android:text="Đăng nhập"
-        android:textColor="#ffffff"
-        android:textColorHighlight="#2B2D30"
-        android:textSize="18sp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="84dp"
+        android:backgroundTint="@color/blue_dam"
+        android:text="Đăng ký"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtmatkhau" />
 
-    <TextView
-        android:id="@+id/hoichuacotaikhoan"
-        android:layout_width="wrap_content"
-        android:layout_height="34dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="44dp"
-        android:gravity="top"
-        android:lineSpacingExtra="-2sp"
-        android:text="Bạn chưa có tài khoản?"
-        android:textAppearance="@style/t_n_ng_nh_p"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btndang_nhap" />
-
-    <Button
-        android:id="@+id/btndang_ky"
-
-        android:layout_width="145dp"
-        android:layout_height="69dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="28dp"
-        android:backgroundTint="@color/blue_dam"
-        android:background="@drawable/rounded_button"
-        android:text="Đăng ký"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hoichuacotaikhoan" />
 </androidx.constraintlayout.widget.ConstraintLayout>

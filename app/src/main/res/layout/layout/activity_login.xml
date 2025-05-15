@@ -91,15 +91,12 @@
 
     <Button
         android:id="@+id/btndang_nhap"
+        style="@style/dangnhap"
         android:layout_width="145dp"
         android:layout_height="69dp"
         android:layout_marginTop="20dp"
         android:backgroundTint="@color/blue"
-        android:background="@drawable/rounded_button"
         android:text="Đăng nhập"
-        android:textColor="#ffffff"
-        android:textColorHighlight="#2B2D30"
-        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -123,17 +120,14 @@
 
     <Button
         android:id="@+id/btndang_ky"
-
+        style="@style/dangnhap"
         android:layout_width="145dp"
         android:layout_height="69dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="28dp"
         android:backgroundTint="@color/blue_dam"
-        android:background="@drawable/rounded_button"
         android:text="Đăng ký"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
