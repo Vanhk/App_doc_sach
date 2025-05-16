@@ -7,6 +7,14 @@ public class Chapter {
     private int startPage;
     private int endPage;
 
+    public Chapter() {
+    }
+    public Chapter(int bookId, String title, int startPage, int endPage) {
+        this.bookId = bookId;
+        this.title = title;
+        this.startPage = startPage;
+        this.endPage = endPage;
+    }
     public Chapter(int chapterId, int bookId, String title, int startPage, int endPage) {
         this.chapterId = chapterId;
         this.bookId = bookId;

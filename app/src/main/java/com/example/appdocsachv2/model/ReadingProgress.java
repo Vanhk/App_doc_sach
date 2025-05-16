@@ -6,6 +6,9 @@ public class ReadingProgress {
     private int bookId;
     private int currentPage;
 
+    public ReadingProgress() {
+    }
+
     public ReadingProgress(int id, int userId, int bookId, int currentPage) {
         this.id = id;
         this.userId = userId;

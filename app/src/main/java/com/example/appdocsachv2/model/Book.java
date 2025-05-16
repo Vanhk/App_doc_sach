@@ -8,8 +8,12 @@ public class Book {
     private String filePath;
     private String coverImage;
     private int total_pages;
+    private String summary; // Thêm trường nội dung tóm tắt
 
-    public Book(int bookId, String title, String author, String genre, String filePath, String coverImage, int total_pages) {
+    public Book() {
+    }
+
+    public Book(int bookId, String title, String author, String genre, String filePath, String coverImage, int total_pages,String summary) {
         this.bookId = bookId;
         this.title = title;
         this.author = author;
@@ -17,6 +21,8 @@ public class Book {
         this.filePath = filePath;
         this.coverImage = coverImage;
         this.total_pages = total_pages;
+        this.summary = summary;
+
     }
 
     public int getBookId() {
@@ -74,4 +80,6 @@ public class Book {
     public void setTotal_pages(int total_pages) {
         this.total_pages = total_pages;
     }
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
 }
