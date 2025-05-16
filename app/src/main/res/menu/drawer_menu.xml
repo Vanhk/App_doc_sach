@@ -13,7 +13,7 @@
 
         android:title="Sách yêu thích" />
     <item
-        android:id="@+id/nav_export"
+        android:id="@+id/nav_logout"
 
         android:title="Đăng xuất" />
     <item

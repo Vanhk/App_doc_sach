@@ -83,7 +83,7 @@
         android:background="@drawable/edittext_background"
         android:ems="10"
         android:hint="Mật khẩu"
-        android:inputType="text"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"

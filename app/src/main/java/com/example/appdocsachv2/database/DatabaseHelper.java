@@ -1,12 +1,56 @@
 package com.example.appdocsachv2.database;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
+    private static final String TAG = "DatabaseHelper";
     private static final String DATABASE_NAME = "BookApp.db";
     private static final int DATABASE_VERSION = 2; // Tăng version để áp dụng nâng cấp
+    // Bảng User
+
+    public static final String TABLE_USER = "User";
+    public static final String COLUMN_USER_ID = "user_id";
+    public static final String COLUMN_USERNAME = "username";
+    public static final String COLUMN_PASSWORD = "password";
+    public static final String COLUMN_EMAIL = "email";
+
+    // Bảng Book
+    public static final String TABLE_BOOK = "Book";
+    public static final String COLUMN_BOOK_ID = "book_id";
+    public static final String COLUMN_TITLE = "title";
+    public static final String COLUMN_AUTHOR = "author";
+    public static final String COLUMN_GENRE = "genre";
+    public static final String COLUMN_FILE_PATH = "file_path";
+    public static final String COLUMN_COVER_IMAGE = "cover_image";
+    public static final String COLUMN_TOTAL_PAGES = "total_pages";
+    public static final String COLUMN_SUMMARY = "summary";
+
+    // Bảng Chapter
+    public static final String TABLE_CHAPTER = "Chapter";
+    public static final String COLUMN_CHAPTER_ID = "chapter_id";
+    public static final String COLUMN_BOOK_ID_FK = "book_id";
+    public static final String COLUMN_CHAPTER_TITLE = "title";
+    public static final String COLUMN_START_PAGE = "start_page";
+    public static final String COLUMN_END_PAGE = "end_page";
+
+    // Bảng FavoriteBook
+    public static final String TABLE_FAVORITE_BOOK = "FavoriteBook";
+    public static final String COLUMN_FAVORITE_ID = "id";
+    public static final String COLUMN_FAVORITE_USER_ID = "user_id";
+    public static final String COLUMN_FAVORITE_BOOK_ID = "book_id";
+
+    // Bảng ReadingProgress
+    public static final String TABLE_READING_PROGRESS = "ReadingProgress";
+    public static final String COLUMN_PROGRESS_ID = "id";
+    public static final String COLUMN_USER_ID_FK = "user_id";
+    public static final String COLUMN_BOOK_ID_FK_PROGRESS = "book_id";
+    public static final String COLUMN_CURRENT_PAGE = "current_page";
 
     // Tạo bảng User
     private static final String CREATE_TABLE_USER = "CREATE TABLE IF NOT EXISTS User (" +
@@ -65,11 +109,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TABLE_USER);
-        db.execSQL(CREATE_TABLE_BOOK);
-        db.execSQL(CREATE_TABLE_CHAPTER);
-        db.execSQL(CREATE_TABLE_FAVORITE_BOOK);
-        db.execSQL(CREATE_TABLE_READING_PROGRESS);
+        try {
+            db.execSQL(CREATE_TABLE_USER);
+            db.execSQL(CREATE_TABLE_BOOK);
+            db.execSQL(CREATE_TABLE_CHAPTER);
+            db.execSQL(CREATE_TABLE_FAVORITE_BOOK);
+            db.execSQL(CREATE_TABLE_READING_PROGRESS);
+
+            // Thêm tài khoản admin mặc định nếu chưa tồn tại
+            Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_USER + " WHERE " + COLUMN_USERNAME + " = ?", new String[]{"admin"});
+            if (cursor != null) {
+                if (cursor.moveToFirst() && cursor.getInt(0) == 0) {
+                    ContentValues values = new ContentValues();
+                    values.put(COLUMN_USERNAME, "admin");
+                    values.put(COLUMN_PASSWORD, "admin"); // Mật khẩu mặc định
+                    values.put(COLUMN_EMAIL, "admin@example.com");
+                    long result = db.insert(TABLE_USER, null, values);
+                    if (result != -1) {
+                        Log.d(TAG, "Added default admin user with ID: " + result);
+                    } else {
+                        Log.e(TAG, "Failed to add default admin user");
+                    }
+                }
+                cursor.close();
+            }
+            Log.d(TAG, "Database tables created successfully");
+        } catch (SQLiteException e) {
+            Log.e(TAG, "Error creating database tables: " + e.getMessage());
+        }
     }
 
     @Override

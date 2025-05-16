@@ -45,7 +45,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
 
     public void setSelectedPosition(int position) {
         selectedPosition = position;
-        notifyDataSetChanged();
+        notifyDataSetChanged(); // Cập nhật giao diện khi thay đổi vị trí chọn
     }
 
     public static class ChapterViewHolder extends RecyclerView.ViewHolder {
@@ -59,11 +59,15 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         public void bind(Chapter chapter, OnItemClickListener listener, boolean isSelected) {
             txtChapterTitle.setText(chapter.getTitle());
             if (isSelected) {
-                txtChapterTitle.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.selected_background));
+                itemView.setBackgroundResource(R.drawable.selected_item_background);
             } else {
-                txtChapterTitle.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
+                itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
-            itemView.setOnClickListener(v -> listener.onItemClick(chapter));
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemClick(chapter);
+                }
+            });
         }
     }
 }

@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="#F8DFFF"
     tools:context=".view.activity.BookDetailActivity">
 
@@ -24,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/btnBack"
+            android:id="@+id/btnBackdetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -50,7 +51,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="2"
                 android:orientation="vertical">
@@ -72,9 +73,10 @@
                     <TextView
                         android:id="@+id/txt"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="Tác giả:" />
+                        android:text="Tác giả:"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtTacGia"
@@ -91,10 +93,11 @@
 
                     <TextView
                         android:id="@+id/textView13"
-                        android:layout_width="wrap_content"
+                        android:layout_width="49dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Thể loại:" />
+                        android:text="Thể loại:"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtTheLoai"
@@ -116,7 +119,11 @@
                         android:layout_height="40dp"
                         android:layout_marginRight="5dp"
                         android:layout_weight="1"
+                        android:textAllCaps="false"
                         android:text="Tiếp tục đọc"
+                        android:textColor="#ffffff"
+                        android:backgroundTint="@color/blue"
+                        android:background="@drawable/rounded_button"
                         android:textSize="13dp"
                         tools:ignore="TextSizeCheck,TouchTargetSizeCheck" />
 
@@ -125,7 +132,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:layout_weight="1"
+                        android:textAllCaps="false"
                         android:text="Đọc từ đầu"
+                        android:textColor="#ffffff"
+                        android:backgroundTint="@color/blue"
+                        android:background="@drawable/rounded_button"
                         android:textSize="13dp"
                         tools:ignore="TextSizeCheck,TouchTargetSizeCheck" />
 
@@ -146,6 +157,8 @@
             android:id="@+id/textView10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="20dp"
             android:text="Nội dung tóm tắt" />
 
         <TextView
@@ -154,8 +167,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:text="5 năm sau khi thế giới thay đổi, trùm cuối xuất hiện. [Trùm cuối của khu vực Trái đất, Nữ hoàng băng giá, đã xuất hiện.] Trùm cuối! Nếu chúng ta có thể đánh bại cô ấy, cuộc sống của chúng ta sẽ trở lại bình thường! Năm người chơi hàng đầu thế giới, bao gồm cả Spectre Seo Jun-ho, cuối cùng đã đánh bại Frost Queen ... Nhưng họ đã chìm vào giấc ngủ sâu. 25 năm trôi qua. Tầng thứ hai? Nó không kết thúc khi Nữ hoàng băng giá chết? Bóng ma tỉnh dậy sau giấc ngủ của mình.
-                 Đây chỉ là một phần nhỏ trong hành trình của Sự Trở Lại Của Người Chơi Bị Đóng Băng – câu chuyện còn ẩn chứa nhiều bất ngờ và kịch tính hơn nữa, chắc chắn sẽ khiến bạn không thể rời mắt." />
+            android:textSize="16dp"
+            android:text="tom tat tai day" />
 
         <TextView
             android:id="@+id/textView12"

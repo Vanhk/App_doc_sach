@@ -38,7 +38,7 @@ import java.util.ArrayList;
 public class AddEditBookActivity extends AppCompatActivity {
     private EditText edtTitle, edtAuthor, edtGenre, edtFilePath, edtTotalPages, edtsummary;
     private ImageView imgCover;
-    private Button btnSave, btnAddChapter;
+    private Button btnSave, btnAddChapter,btnEdit;
     private LinearLayout chapterContainer;
     private TextView tvTitle;
     private BookController bookController;
@@ -92,6 +92,7 @@ public class AddEditBookActivity extends AppCompatActivity {
         chapterContainer = findViewById(R.id.chapterContainer);
         imgCover = findViewById(R.id.btchoosefile);
         btnSave = findViewById(R.id.btsave);
+        btnEdit = findViewById(R.id.btedit);
         tvTitle = findViewById(R.id.tvTitle);
         ImageView btnChooseFile = findViewById(R.id.btnchoosefile);
 
@@ -108,13 +109,30 @@ public class AddEditBookActivity extends AppCompatActivity {
             loadBookData(bookId);
             loadChaptersData(bookId);
             tvTitle.setText("Sửa sách");
+            tvTitle.setTextSize(20);
         } else {
             tvTitle.setText("Thêm sách");
+            tvTitle.setTextSize(20);
         }
-
+        if (bookId == -1) {
+            // Chế độ thêm mới
+            btnSave.setVisibility(View.VISIBLE);
+            btnEdit.setVisibility(View.GONE);
+        } else {
+            // Chế độ sửa đổi
+            btnSave.setVisibility(View.GONE);
+            btnEdit.setVisibility(View.VISIBLE);
+        }
         // Sự kiện quay lại
         ImageView btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> onBackPressed());
+        btnBack.setOnClickListener(v -> {
+            Intent intentBack = new Intent(AddEditBookActivity.this, BookListActivity.class);
+            intentBack.putExtra("list_type", "my_books");
+            intentBack.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intentBack);
+            finish(); // Đảm bảo AddEditBookActivity được xóa khỏi stack
+        });
+
         // Sự kiện chọn ảnh bìa
         imgCover.setOnClickListener(v -> openImagePicker());
         // Sự kiện chọn file
@@ -123,6 +141,8 @@ public class AddEditBookActivity extends AppCompatActivity {
         btnAddChapter.setOnClickListener(v -> addChapterField());
         // Sự kiện lưu
         btnSave.setOnClickListener(v -> saveBookAndChapters());
+        btnEdit.setOnClickListener(v -> saveBookAndChapters());
+
     }
 
     private void openImagePicker() {
@@ -327,7 +347,11 @@ public class AddEditBookActivity extends AppCompatActivity {
             }
 
             Toast.makeText(this, bookId == -1 ? "Thêm sách và chương thành công" : "Cập nhật sách và chương thành công", Toast.LENGTH_SHORT).show();
-            finish();
+            Intent intent = new Intent(AddEditBookActivity.this, BookListActivity.class);
+            intent.putExtra("list_type", "my_books");
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish(); // Đảm bảo AddEditBookActivity được xóa khỏi stack
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }

@@ -2,7 +2,6 @@ package com.example.appdocsachv2.view.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,16 +11,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.appdocsachv2.R;
 import com.example.appdocsachv2.controller.BookController;
 import com.example.appdocsachv2.model.Book;
-import com.example.appdocsachv2.model.BookDAO;
 import com.example.appdocsachv2.view.activity.AddEditBookActivity;
 import com.example.appdocsachv2.view.activity.BookDetailActivity;
 import com.example.appdocsachv2.view.activity.BookListActivity;
+import com.example.appdocsachv2.view.activity.ChapterListActivity;
 import com.example.appdocsachv2.view.activity.HomeActivity;
 
 import java.util.List;
@@ -32,8 +32,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     private OnItemClickListener listener;
     private HomeActivity homeActivity;
     private BookListActivity bookListActivity;
+    private BookDetailActivity bookDetailActivity;
     private boolean showFavoriteIcon;
     private Context context;
+    private BookController bookController;
+    private int userId;
 
     public interface OnItemClickListener {
         void onItemClick(Book book);
@@ -46,20 +49,37 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         this.context = context;
     }
 
-    public BookAdapter(List<Book> bookList, OnItemClickListener listener, HomeActivity homeActivity, boolean showFavoriteIcon) {
+    public BookAdapter(List<Book> bookList, OnItemClickListener listener, HomeActivity homeActivity, boolean showFavoriteIcon, BookController bookController, int userId) {
         this.bookList = bookList;
         this.listener = listener;
         this.homeActivity = homeActivity;
         this.showFavoriteIcon = showFavoriteIcon;
         this.context = homeActivity;
+        this.bookController = bookController;
+        this.userId = userId;
+        Log.d(TAG, "BookAdapter initialized for HomeActivity with showFavoriteIcon: " + showFavoriteIcon + ", userId: " + userId);
     }
 
-    public BookAdapter(List<Book> bookList, OnItemClickListener listener, BookListActivity bookListActivity, boolean showFavoriteIcon) {
+    public BookAdapter(List<Book> bookList, OnItemClickListener listener, BookListActivity bookListActivity, boolean showFavoriteIcon, BookController bookController, int userId) {
         this.bookList = bookList;
         this.listener = listener;
         this.bookListActivity = bookListActivity;
         this.showFavoriteIcon = showFavoriteIcon;
         this.context = bookListActivity;
+        this.bookController = bookController;
+        this.userId = userId;
+        Log.d(TAG, "BookAdapter initialized for BookListActivity with showFavoriteIcon: " + showFavoriteIcon + ", userId: " + userId);
+    }
+
+    public BookAdapter(List<Book> bookList, OnItemClickListener listener, BookDetailActivity bookDetailActivity, boolean showFavoriteIcon, BookController bookController, int userId) {
+        this.bookList = bookList;
+        this.listener = listener;
+        this.bookDetailActivity = bookDetailActivity;
+        this.showFavoriteIcon = showFavoriteIcon;
+        this.context = bookDetailActivity;
+        this.bookController = bookController;
+        this.userId = userId;
+        Log.d(TAG, "BookAdapter initialized for BookDetailActivity with showFavoriteIcon: " + showFavoriteIcon + ", userId: " + userId);
     }
 
     public void updateData(List<Book> newBooks) {
@@ -81,6 +101,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             Book book = bookList.get(position);
             Log.d(TAG, "Binding book at position " + position + ": " + (book != null ? book.getTitle() : "null"));
             holder.bind(book, listener);
+        } else {
+            Log.e(TAG, "Invalid position or bookList: position=" + position + ", bookList=" + (bookList != null ? bookList.size() : "null"));
         }
     }
 
@@ -125,6 +147,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
             View.OnClickListener openDetail = v -> {
                 Log.d(TAG, "Clicked on book: " + book.getTitle());
+                if (listener != null) listener.onItemClick(book);
                 Intent intent = new Intent(context, BookDetailActivity.class);
                 intent.putExtra("book_id", book.getBookId());
                 context.startActivity(intent);
@@ -137,37 +160,67 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
                 btnDelete.setVisibility(View.GONE);
                 btnFavorite.setVisibility(View.VISIBLE);
 
+                final int position = getAdapterPosition();
+                btnFavorite.setOnClickListener(v -> {
+                    if (position != RecyclerView.NO_POSITION) {
+                        List<Integer> favoriteBookIds = null;
+                        if (homeActivity != null) {
+                            favoriteBookIds = homeActivity.getFavoriteBookIds();
+                        } else if (bookListActivity != null) {
+                            favoriteBookIds = bookListActivity.getFavoriteBookIds();
+                        } else if (bookDetailActivity != null) {
+                            favoriteBookIds = bookDetailActivity.getFavoriteBookIds();
+                        }
+
+                        if (favoriteBookIds != null) {
+                            if (favoriteBookIds.contains(book.getBookId())) {
+                                Log.d(TAG, "Removing bookId " + book.getBookId() + " from favorites");
+                                if (homeActivity != null) {
+                                    homeActivity.removeFromFavorites(book.getBookId());
+                                } else if (bookListActivity != null) {
+                                    bookListActivity.removeFromFavorites(book.getBookId());
+                                } else if (bookDetailActivity != null) {
+                                    bookDetailActivity.removeFromFavorites(book.getBookId());
+                                }
+                                btnFavorite.setImageResource(R.drawable.icon_ionic_ios_bookmark);
+                            } else {
+                                Log.d(TAG, "Adding bookId " + book.getBookId() + " to favorites");
+                                if (homeActivity != null) {
+                                    homeActivity.addToFavorites(book.getBookId());
+                                } else if (bookListActivity != null) {
+                                    bookListActivity.addToFavorites(book.getBookId());
+                                } else if (bookDetailActivity != null) {
+                                    bookDetailActivity.addToFavorites(book.getBookId());
+                                }
+                                btnFavorite.setImageResource(R.drawable.baseline_bookmark_24);
+                            }
+
+                            // Gửi broadcast thông báo thay đổi trạng thái yêu thích
+                            Intent broadcastIntent = new Intent(ChapterListActivity.ACTION_FAVORITE_CHANGED);
+                            broadcastIntent.putExtra(ChapterListActivity.EXTRA_BOOK_ID, book.getBookId());
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(broadcastIntent);
+
+                            notifyItemChanged(position);
+                        } else {
+                            Log.e(TAG, "favoriteBookIds is null at position: " + position);
+                        }
+                    }
+                });
+
+                // Cập nhật trạng thái icon ngay khi bind
                 List<Integer> favoriteBookIds = null;
                 if (homeActivity != null) {
                     favoriteBookIds = homeActivity.getFavoriteBookIds();
                 } else if (bookListActivity != null) {
                     favoriteBookIds = bookListActivity.getFavoriteBookIds();
+                } else if (bookDetailActivity != null) {
+                    favoriteBookIds = bookDetailActivity.getFavoriteBookIds();
                 }
-
                 if (favoriteBookIds != null && favoriteBookIds.contains(book.getBookId())) {
                     btnFavorite.setImageResource(R.drawable.baseline_bookmark_24);
                 } else {
                     btnFavorite.setImageResource(R.drawable.icon_ionic_ios_bookmark);
                 }
-
-//                btnFavorite.setOnClickListener(v -> {
-//                    if (favoriteBookIds != null) {
-//                        if (favoriteBookIds.contains(book.getBookId())) {
-//                            if (homeActivity != null) {
-//                                homeActivity.removeFromFavorites(book.getBookId());
-//                            } else if (bookListActivity != null) {
-//                                bookListActivity.removeFromFavorites(book.getBookId());
-//                            }
-//                        } else {
-//                            if (homeActivity != null) {
-//                                homeActivity.addToFavorites(book.getBookId());
-//                            } else if (bookListActivity != null) {
-//                                bookListActivity.addToFavorites(book.getBookId());
-//                            }
-//                        }
-//                        notifyDataSetChanged();
-//                    }
-//                });
             } else {
                 btnEdit.setVisibility(View.VISIBLE);
                 btnDelete.setVisibility(View.VISIBLE);
@@ -186,20 +239,23 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
                             .setTitle("Xác nhận xóa")
                             .setMessage("Bạn có chắc muốn xóa cuốn sách '" + book.getTitle() + "' không?")
                             .setPositiveButton("Có", (dialog, which) -> {
-                                BookController bookController = new BookController(new BookDAO(context));
-                                if (bookController.deleteBook(book.getBookId())) {
-                                    int position = getAdapterPosition();
-                                    if (position != RecyclerView.NO_POSITION) {
-                                        bookList.remove(position);
-                                        notifyItemRemoved(position);
-                                        if (bookListActivity != null) {
-                                            bookListActivity.loadBooks();
-                                        } else if (homeActivity != null) {
-                                            homeActivity.loadData();
+                                if (bookController != null) {
+                                    if (bookController.deleteBook(book.getBookId())) {
+                                        int position = getAdapterPosition();
+                                        if (position != RecyclerView.NO_POSITION) {
+                                            bookList.remove(position);
+                                            notifyItemRemoved(position);
+                                            if (bookListActivity != null) {
+                                                bookListActivity.loadBooks();
+                                            } else if (homeActivity != null) {
+                                                homeActivity.loadData();
+                                            }
                                         }
+                                    } else {
+                                        Log.e(TAG, "Failed to delete book with id: " + book.getBookId());
                                     }
                                 } else {
-                                    Log.e(TAG, "Failed to delete book with id: " + book.getBookId());
+                                    Log.e(TAG, "BookController is null");
                                 }
                             })
                             .setNegativeButton("Không", null)

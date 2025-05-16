@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".view.activity.ChapterListActivity"
     android:background="@drawable/background_chapter">
 
@@ -27,13 +28,13 @@
 
         <ImageButton
             android:id="@+id/btnBookMark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:contentDescription="BookMark"
+            android:layout_width="32dp"
+            android:layout_height="33dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:background="@android:color/transparent"
+            android:contentDescription="BookMark"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.942"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/baseline_bookmark_24"
             tools:ignore="TouchTargetSizeCheck" />
@@ -65,10 +66,11 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewChapters"
-            android:layout_width="0dp"
+            android:layout_width="330dp"
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
+            android:background="#E0E0E0"
             app:layout_constraintBottom_toTopOf="@+id/button2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -76,12 +78,14 @@
 
         <Button
             android:id="@+id/button2"
-            android:layout_width="wrap_content"
+            android:layout_width="140dp"
             android:layout_height="72dp"
             android:layout_marginBottom="92dp"
-            android:drawableLeft="@drawable/icon_book"
             android:text="Đọc"
             android:textSize="25dp"
+            android:textColor="#ffffff"
+            android:backgroundTint="@color/blue"
+            android:background="@drawable/rounded_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

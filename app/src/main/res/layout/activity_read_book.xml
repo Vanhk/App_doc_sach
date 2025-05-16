@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".view.activity.ReadBookActivity"
-    android:background="@drawable/gradient_background"
-    >
+    android:background="@drawable/gradient_background">
 
     <ImageButton
         android:id="@+id/btnQuaylai"
@@ -21,6 +21,7 @@
         tools:ignore="TouchTargetSizeCheck" />
 
     <TextView
+        android:id="@+id/tvBookTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -30,26 +31,25 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/tvChapter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Chương: 1"
         android:gravity="center"
         android:textSize="20dp"
         android:textColor="@android:color/black"/>
-    <ScrollView
+
+    <ImageView
+        android:id="@+id/pdfView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Bản thân nỗi đau là rất quan trọng..."
-            android:textSize="15sp"
-            android:textColor="#333333" />
-    </ScrollView>
     <TextView
+        android:id="@+id/tvPageNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="10/200"
@@ -58,6 +58,7 @@
         android:textSize="13sp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,6 +66,7 @@
         android:orientation="horizontal">
 
         <ImageButton
+            android:id="@+id/imgbtprev"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_margin="8dp"
@@ -73,6 +75,7 @@
             android:contentDescription="Trước"/>
 
         <ImageButton
+            android:id="@+id/imgbtnext"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginLeft="10dp"

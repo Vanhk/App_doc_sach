@@ -1,26 +1,221 @@
 package com.example.appdocsachv2.view.activity;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.appdocsachv2.R;
+import com.example.appdocsachv2.model.Chapter;
+import com.example.appdocsachv2.model.ChapterDAO;
+import com.example.appdocsachv2.model.ReadingProgressDAO;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class ReadBookActivity extends AppCompatActivity {
+
+    private ImageView pdfImageView;
+    private TextView tvBookTitle, tvChapter, tvPageNumber;
+    private ImageButton btnNext, btnPrev;
+
+    private ParcelFileDescriptor fileDescriptor;
+    private PdfRenderer pdfRenderer;
+    private PdfRenderer.Page currentPage;
+
+    private int currentPageIndex = 0;
+    private int totalPage = 0;
+    private int startPage = 0;
+    private int endPage = -1;
+    private int userId;
+
+    private String pdfPath;
+    private String bookTitle, chapterTitle;
+    private int bookId;
+
+    private List<Chapter> chapterList;
+    private ReadingProgressDAO readingProgressDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_read_book);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        // Ánh xạ view
+        pdfImageView = findViewById(R.id.pdfView);
+        tvBookTitle = findViewById(R.id.tvBookTitle);
+        tvChapter = findViewById(R.id.tvChapter);
+        tvPageNumber = findViewById(R.id.tvPageNumber);
+        btnNext = findViewById(R.id.imgbtnext);
+        btnPrev = findViewById(R.id.imgbtprev);
+        ImageButton btnBack = findViewById(R.id.btnQuaylai);
+
+        // Khởi tạo DAO
+        readingProgressDAO = new ReadingProgressDAO(this);
+        ChapterDAO chapterDAO = new ChapterDAO(this);
+
+        // Lấy dữ liệu từ Intent
+        Intent intent = getIntent();
+        pdfPath = intent.getStringExtra("pdf_path");
+        bookTitle = intent.getStringExtra("book_title");
+        chapterTitle = intent.getStringExtra("chapter_title"); // Tiêu đề chương từ Intent
+        startPage = intent.getIntExtra("chapter_id", 0); // Sử dụng chapter_id từ Intent
+        endPage = intent.getIntExtra("end_page", -1);
+        totalPage = intent.getIntExtra("total_pages", 0);
+        bookId = intent.getIntExtra("book_id", -1);
+        userId = intent.getIntExtra("user_id", -1);
+        currentPageIndex = startPage;
+
+        // Kiểm tra userId
+        if (userId == -1) {
+            Log.e("ReadBookActivity", "Invalid userId received");
+            Toast.makeText(this, "Không thể xác định người dùng", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Kiểm tra pdfPath
+        if (pdfPath == null || pdfPath.isEmpty()) {
+            Log.e("ReadBookActivity", "Invalid pdfPath received");
+            Toast.makeText(this, "Không thể tìm thấy file PDF", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Set tiêu đề sách
+        tvBookTitle.setText(bookTitle != null ? bookTitle : "Tên sách");
+
+        // Load danh sách chương từ DB
+        chapterList = chapterDAO.getChaptersByBookId(bookId);
+
+        // Cập nhật tiêu đề chương
+        if (chapterTitle != null && !chapterTitle.isEmpty() && !chapterTitle.equals("Đọc từ đầu")) {
+            tvChapter.setText(chapterTitle);
+        } else {
+            updateChapterByPage(currentPageIndex);
+        }
+
+        openRenderer();
+
+        // Sự kiện nút
+        btnNext.setOnClickListener(view -> {
+            int maxPage = (endPage >= 0 && endPage < totalPage) ? endPage : totalPage - 1;
+            if (currentPageIndex < maxPage) {
+                currentPageIndex++;
+                showPage(currentPageIndex);
+                saveReadingProgress(currentPageIndex);
+                if (chapterTitle == null || chapterTitle.isEmpty() || chapterTitle.equals("Đọc từ đầu")) {
+                    updateChapterByPage(currentPageIndex);
+                }
+            }
         });
+
+        btnPrev.setOnClickListener(view -> {
+            if (currentPageIndex > startPage) {
+                currentPageIndex--;
+                showPage(currentPageIndex);
+                saveReadingProgress(currentPageIndex);
+                if (chapterTitle == null || chapterTitle.isEmpty() || chapterTitle.equals("Đọc từ đầu")) {
+                    updateChapterByPage(currentPageIndex);
+                }
+            }
+        });
+
+        btnBack.setOnClickListener(v -> finish());
+    }
+
+    private void openRenderer() {
+        try {
+            File file = new File(pdfPath);
+            if (!file.exists()) {
+                Toast.makeText(this, "File PDF không tồn tại", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+            pdfRenderer = new PdfRenderer(fileDescriptor);
+            totalPage = pdfRenderer.getPageCount();
+
+            if (startPage < 0 || startPage >= totalPage) startPage = 0;
+            if (endPage >= totalPage || endPage == -1) endPage = totalPage - 1;
+
+            showPage(currentPageIndex);
+            // Cập nhật chương ngay khi mở nếu không có chapterTitle cụ thể
+            if (chapterTitle == null || chapterTitle.isEmpty() || chapterTitle.equals("Đọc từ đầu")) {
+                updateChapterByPage(currentPageIndex);
+            }
+
+            // Lưu tiến trình đọc ban đầu
+            saveReadingProgress(currentPageIndex);
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Không thể mở file PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e("PDF", "Lỗi: " + e.getMessage());
+        }
+    }
+
+    private void showPage(int index) {
+        if (pdfRenderer == null || index < 0 || index >= totalPage) return;
+
+        if (currentPage != null) {
+            currentPage.close();
+        }
+
+        currentPage = pdfRenderer.openPage(index);
+        Bitmap bitmap = Bitmap.createBitmap(
+                currentPage.getWidth() * 2, // Tăng kích thước để rõ hơn
+                currentPage.getHeight() * 2,
+                Bitmap.Config.ARGB_8888
+        );
+        currentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+        pdfImageView.setImageBitmap(bitmap);
+        tvPageNumber.setText((index + 1) + " / " + totalPage);
+    }
+
+    private void updateChapterByPage(int pageIndex) {
+        if (chapterList == null || chapterList.isEmpty()) {
+            tvChapter.setText("Không có chương");
+            return;
+        }
+
+        for (Chapter chapter : chapterList) {
+            if (pageIndex >= chapter.getStartPage() && pageIndex <= chapter.getEndPage()) {
+                tvChapter.setText(chapter.getTitle());
+                return;
+            }
+        }
+        tvChapter.setText("Chưa thuộc chương nào");
+    }
+
+    private void saveReadingProgress(int pageIndex) {
+        if (bookId == -1 || userId == -1) {
+            Log.e("ReadBookActivity", "Cannot save reading progress: Invalid bookId or userId");
+            return;
+        }
+
+        readingProgressDAO.insertOrUpdateReadingProgress(userId, bookId, pageIndex);
+        Log.d("ReadBookActivity", "Saved reading progress: userId=" + userId + ", bookId=" + bookId + ", page=" + pageIndex);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            if (currentPage != null) currentPage.close();
+            if (pdfRenderer != null) pdfRenderer.close();
+            if (fileDescriptor != null) fileDescriptor.close();
+        } catch (IOException e) {
+            Log.e("PDF", "Lỗi đóng tài nguyên: " + e.getMessage());
+        }
     }
 }

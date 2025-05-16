@@ -1,14 +1,20 @@
 package com.example.appdocsachv2.view.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +24,7 @@ import com.example.appdocsachv2.controller.BookController;
 import com.example.appdocsachv2.controller.ChapterController;
 import com.example.appdocsachv2.model.Book;
 import com.example.appdocsachv2.model.BookDAO;
+import com.example.appdocsachv2.model.Chapter;
 import com.example.appdocsachv2.model.ChapterDAO;
 import com.example.appdocsachv2.model.ReadingProgressDAO;
 import com.example.appdocsachv2.utils.SessionManager;
@@ -40,6 +47,26 @@ public class BookDetailActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private int bookId;
     private Button btnTiepTuc, btnDocTuDau;
+    private int userId;
+    private String listType;
+    private boolean fromHome;
+    private Book currentBook;
+    private SharedPreferences sharedPreferences;
+    private static final String PREFS_NAME = "Favorites";
+    private static final String FAVORITES_KEY = "favorite_book_ids_user_";
+    public static final String ACTION_FAVORITE_CHANGED = "com.example.appdocsachv2.FAVORITE_CHANGED";
+    public static final String EXTRA_BOOK_ID = "book_id";
+
+    private BroadcastReceiver favoriteChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int changedBookId = intent.getIntExtra(EXTRA_BOOK_ID, -1);
+            if (changedBookId == bookId) {
+                updateFavoriteIcon();
+                loadRelatedBooks();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +74,42 @@ public class BookDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_book_detail);
 
         // Ánh xạ view
-        btnBack = findViewById(R.id.btnBack);
+        mapViews();
+
+        // Khởi tạo controller và DAO
+        initializeControllers();
+
+        // Khởi tạo SharedPreferences
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        // Lấy thông tin từ Intent
+        getIntentData();
+
+        // Khởi tạo adapter danh sách sách liên quan
+        setupRelatedBooksAdapter();
+
+        // Lấy bookId và hiển thị nội dung sách
+        bookId = getIntent().getIntExtra("book_id", -1);
+        if (bookId != -1) {
+            currentBook = bookController.getBookById(bookId);
+            if (currentBook != null) {
+                displayBookDetails();
+                loadRelatedBooks();
+            } else {
+                Log.e(TAG, "Book not found with book_id: " + bookId);
+                finish();
+            }
+        } else {
+            Log.e(TAG, "Invalid book_id received");
+            finish();
+        }
+
+        // Xử lý sự kiện
+        setupEvents();
+    }
+
+    private void mapViews() {
+        btnBack = findViewById(R.id.btnBackdetails);
         imgBook = findViewById(R.id.imgBook);
         imgFavorite = findViewById(R.id.imagefavorite);
         txtTenSach = findViewById(R.id.txtTenSach);
@@ -57,115 +119,232 @@ public class BookDetailActivity extends AppCompatActivity {
         rvSach = findViewById(R.id.rvSach);
         btnTiepTuc = findViewById(R.id.btnTiepTuc);
         btnDocTuDau = findViewById(R.id.btnDocTuDau);
+    }
 
-        // Khởi tạo controller và DAO
+    private void initializeControllers() {
         bookController = new BookController(new BookDAO(this));
         chapterController = new ChapterController(new ChapterDAO(this));
         readingProgressDAO = new ReadingProgressDAO(this);
         sessionManager = new SessionManager(this);
-
-        // Khởi tạo danh sách sách liên quan
-        relatedBooksList = new ArrayList<>();
-        relatedBooksAdapter = new BookAdapter(relatedBooksList, book -> {
-            Intent intent = new Intent(BookDetailActivity.this, BookDetailActivity.class);
-            intent.putExtra("book_id", book.getBookId());
-            startActivity(intent);
-        }, this);
-        rvSach.setLayoutManager(new GridLayoutManager(this, 3));
-        rvSach.setAdapter(relatedBooksAdapter);
-
-        // Lấy bookId từ Intent
-        bookId = getIntent().getIntExtra("book_id", -1);
-        Log.d(TAG, "Received book_id: " + bookId);
-
-        if (bookId != -1) {
-            loadBookDetails();
-            loadRelatedBooks();
-        } else {
-            Log.e(TAG, "Invalid book_id received");
-            finish();
+        userId = getIntent().getIntExtra("user_id", sessionManager.getUserId());
+        if (userId == -1) {
+            Log.e(TAG, "User ID not found, defaulting to 1");
+            userId = 1;
         }
-
-        // Sự kiện quay lại
-        btnBack.setOnClickListener(v -> onBackPressed());
-
-//        // Sự kiện "Tiếp tục đọc"
-//        btnTiepTuc.setOnClickListener(v -> {
-//            int userId = sessionManager.getUserId();
-//            if (userId != -1) {
-//                int lastReadChapterId = readingProgressDAO.getLastReadChapterId(userId, bookId);
-//                Intent intent = new Intent(BookDetailActivity.this, ReadBookActivity.class);
-//                intent.putExtra("book_id", bookId);
-//                intent.putExtra("chapter_id", lastReadChapterId != -1 ? lastReadChapterId : 1);
-//                startActivity(intent);
-//            } else {
-//                Log.e(TAG, "User ID not found");
-//            }
-//        });
-
-        // Sự kiện "Đọc từ đầu"
-        btnDocTuDau.setOnClickListener(v -> {
-            Intent intent = new Intent(BookDetailActivity.this, ChapterListActivity.class);
-            intent.putExtra("book_id", bookId);
-            startActivity(intent);
-        });
-
-        // Xử lý icon yêu thích
-        updateFavoriteIcon();
-        imgFavorite.setOnClickListener(v -> {
-            if (bookController.isFavorite(bookId)) {
-                bookController.removeFavorite(bookId);
-            } else {
-                bookController.addFavorite(bookId);
-            }
-            updateFavoriteIcon();
-        });
     }
 
-    private void loadBookDetails() {
-        Book book = bookController.getBookById(bookId);
-        if (book != null) {
-            txtTenSach.setText(book.getTitle() != null ? book.getTitle() : "Không có tiêu đề");
-            txtTacGia.setText(book.getAuthor() != null ? book.getAuthor() : "Không có tác giả");
-            txtTheLoai.setText(book.getGenre() != null ? book.getGenre() : "Không có thể loại");
-            txtNoiDungTomTat.setText(book.getSummary() != null ? book.getSummary() : "Không có tóm tắt");
+    private void getIntentData() {
+        listType = getIntent().getStringExtra("list_type");
+        if (listType == null) listType = "default";
+        fromHome = getIntent().getBooleanExtra("fromHome", false);
+    }
 
-            if (book.getCoverImage() != null && !book.getCoverImage().isEmpty()) {
-                Glide.with(this).load(book.getCoverImage()).placeholder(R.drawable.noimage).into(imgBook);
+    private void setupRelatedBooksAdapter() {
+        relatedBooksList = new ArrayList<>();
+        relatedBooksAdapter = new BookAdapter(relatedBooksList, book -> {
+            navigateToBookDetail(book.getBookId());
+        }, this, true, bookController, userId);
+        rvSach.setLayoutManager(new GridLayoutManager(this, 3));
+        rvSach.setAdapter(relatedBooksAdapter);
+    }
+
+    private void setupEvents() {
+        btnBack.setOnClickListener(v -> navigateBack());
+
+        btnTiepTuc.setOnClickListener(v -> {
+            int lastReadPage = readingProgressDAO.getLastReadPage(userId, bookId);
+            Log.d(TAG, "Last read page for bookId " + bookId + " and userId " + userId + ": " + lastReadPage);
+            navigateToReadBook(bookId, lastReadPage != -1 ? lastReadPage : 1);
+        });
+
+        btnDocTuDau.setOnClickListener(v -> {
+            List<Chapter> chapters = chapterController.getChaptersByBookId(bookId);
+            if (chapters.isEmpty()) {
+                navigateToReadBook(bookId, 0);
             } else {
-                imgBook.setImageResource(R.drawable.noimage);
+                navigateToChapterList(bookId);
             }
+        });
+
+        imgFavorite.setOnClickListener(v -> {
+            if (isFavorite(bookId)) {
+                removeFromFavorites(bookId);
+                Toast.makeText(this, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+            } else {
+                addToFavorites(bookId);
+                Toast.makeText(this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+            }
+            updateFavoriteIcon();
+            loadRelatedBooks();
+
+            // Gửi broadcast để thông báo thay đổi trạng thái yêu thích
+            Intent broadcastIntent = new Intent(ACTION_FAVORITE_CHANGED);
+            broadcastIntent.putExtra(EXTRA_BOOK_ID, bookId);
+            LocalBroadcastManager.getInstance(BookDetailActivity.this).sendBroadcast(broadcastIntent);
+        });
+
+        updateFavoriteIcon();
+    }
+
+    private void displayBookDetails() {
+        txtTenSach.setText(nonNull(currentBook.getTitle(), "Không có tiêu đề"));
+        txtTacGia.setText(nonNull(currentBook.getAuthor(), "Không có tác giả"));
+        txtTheLoai.setText(nonNull(currentBook.getGenre(), "Không có thể loại"));
+        txtNoiDungTomTat.setText(nonNull(currentBook.getSummary(), "Không có tóm tắt"));
+
+        if (currentBook.getCoverImage() != null && !currentBook.getCoverImage().isEmpty()) {
+            Glide.with(this).load(currentBook.getCoverImage()).placeholder(R.drawable.noimage).into(imgBook);
         } else {
-            Log.e(TAG, "Book not found for book_id: " + bookId);
-            finish();
+            imgBook.setImageResource(R.drawable.noimage);
         }
     }
 
     private void loadRelatedBooks() {
-        Book currentBook = bookController.getBookById(bookId);
         if (currentBook != null && currentBook.getGenre() != null) {
             relatedBooksList.clear();
             List<Book> allBooks = bookController.getAllBooks();
-            if (allBooks != null) {
-                int count = 0;
-                for (Book book : allBooks) {
-                    if (book != null && book.getGenre() != null && book.getGenre().equals(currentBook.getGenre()) &&
-                            book.getBookId() != currentBook.getBookId() && count < 6) {
-                        relatedBooksList.add(book);
-                        count++;
-                    }
+            int count = 0;
+            for (Book book : allBooks) {
+                if (book != null && book.getGenre() != null &&
+                        book.getGenre().equals(currentBook.getGenre()) &&
+                        book.getBookId() != currentBook.getBookId() && count < 6) {
+                    relatedBooksList.add(book);
+                    count++;
                 }
-                relatedBooksAdapter.notifyDataSetChanged();
-            } else {
-                Log.w(TAG, "No books found in database");
             }
-        } else {
-            Log.w(TAG, "Current book or genre is null");
+            relatedBooksAdapter.updateData(relatedBooksList);
         }
     }
 
+    private String nonNull(String value, String fallback) {
+        return value != null ? value : fallback;
+    }
+
     private void updateFavoriteIcon() {
-        imgFavorite.setImageResource(bookController.isFavorite(bookId) ?
+        imgFavorite.setImageResource(isFavorite(bookId) ?
                 R.drawable.baseline_bookmark_24 : R.drawable.icon_ionic_ios_bookmark);
+        Log.d(TAG, "Updated favorite icon for bookId " + bookId + " to " + (isFavorite(bookId) ? "bookmarked" : "unbookmarked"));
+    }
+
+    private boolean isFavorite(int bookId) {
+        return getFavoriteBookIds().contains(bookId);
+    }
+
+    public List<Integer> getFavoriteBookIds() {
+        String favoriteIds = sharedPreferences.getString(FAVORITES_KEY + userId, "");
+        Log.d(TAG, "Checking favorite IDs for user " + userId + ": " + favoriteIds);
+        List<Integer> bookIds = new ArrayList<>();
+        if (!favoriteIds.isEmpty()) {
+            for (String id : favoriteIds.split(",")) {
+                try {
+                    bookIds.add(Integer.parseInt(id.trim()));
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, "Error parsing favorite book id: " + e.getMessage());
+                }
+            }
+        }
+        return bookIds;
+    }
+
+    public void addToFavorites(int bookId) {
+        List<Integer> favoriteBookIds = getFavoriteBookIds();
+        if (!favoriteBookIds.contains(bookId)) {
+            favoriteBookIds.add(bookId);
+            saveFavoriteBookIds(favoriteBookIds);
+        }
+    }
+
+    public void removeFromFavorites(int bookId) {
+        List<Integer> favoriteBookIds = getFavoriteBookIds();
+        if (favoriteBookIds.contains(bookId)) {
+            favoriteBookIds.remove(Integer.valueOf(bookId));
+            saveFavoriteBookIds(favoriteBookIds);
+        }
+    }
+
+    private void saveFavoriteBookIds(List<Integer> bookIds) {
+        String ids = android.text.TextUtils.join(",", bookIds);
+        sharedPreferences.edit().putString(FAVORITES_KEY + userId, ids).apply();
+        Log.d(TAG, "Saved favorite IDs for user " + userId + ": " + ids);
+    }
+
+    // ==== Navigation helper methods ====
+
+    private void navigateToBookDetail(int bookId) {
+        Intent intent = new Intent(this, BookDetailActivity.class);
+        intent.putExtra("book_id", bookId);
+        intent.putExtra("list_type", listType);
+        intent.putExtra("fromHome", fromHome);
+        intent.putExtra("user_id", userId);
+        startActivity(intent);
+    }
+
+    private void navigateBack() {
+        Intent intent;
+        if (fromHome || "my_books".equals(listType) || "reading_progress".equals(listType) || "favorite_books".equals(listType)) {
+            intent = new Intent(this, HomeActivity.class);
+        } else {
+            intent = new Intent(this, BookListActivity.class);
+            intent.putExtra("list_type", listType);
+            intent.putExtra("user_id", userId);
+        }
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    private void navigateToReadBook(int bookId, int chapterIdOrPage) {
+        Book book = bookController.getBookById(bookId);
+        if (book == null) {
+            Toast.makeText(this, "Không tìm thấy sách", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(this, ReadBookActivity.class);
+        intent.putExtra("book_id", bookId);
+        intent.putExtra("chapter_id", chapterIdOrPage);
+        intent.putExtra("user_id", userId);
+        intent.putExtra("pdf_path", book.getFilePath());
+        intent.putExtra("book_title", book.getTitle());
+        startActivity(intent);
+    }
+
+    private void navigateToChapterList(int bookId) {
+        Book book = bookController.getBookById(bookId);
+        if (book == null) {
+            Toast.makeText(this, "Không tìm thấy sách", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(this, ChapterListActivity.class);
+        intent.putExtra("book_id", bookId);
+        intent.putExtra("user_id", userId);
+        intent.putExtra("pdf_path", book.getFilePath());
+        intent.putExtra("book_title", book.getTitle());
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateFavoriteIcon();
+        loadRelatedBooks();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(favoriteChangeReceiver,
+                new IntentFilter(ACTION_FAVORITE_CHANGED));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(favoriteChangeReceiver);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        updateFavoriteIcon();
     }
 }

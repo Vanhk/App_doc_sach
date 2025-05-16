@@ -2,52 +2,55 @@ package com.example.appdocsachv2.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.appdocsachv2.R;
+import com.example.appdocsachv2.utils.SessionManager;
 
 public class LoginActivity extends AppCompatActivity {
-    Button btndang_nhap, btndang_ky;
-    EditText edtTen_dang_nhap, edtmatkhau;
+    private static final String TAG = "LoginActivity";
+    private EditText etUsername, etPassword;
+    private Button btnLogin;
+    private SessionManager sessionManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-        btndang_nhap = findViewById(R.id.btndang_nhap);
-        btndang_ky = findViewById(R.id.btndang_ky);
-        edtTen_dang_nhap = findViewById(R.id.edtTen_dang_nhap);
-        edtmatkhau = findViewById(R.id.edtmatkhau);
-        btndang_nhap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String ten = edtTen_dang_nhap.getText().toString().trim();
-                String mk = edtmatkhau.getText().toString().trim();
 
-                if (ten.equals("admin") && mk.equals("123456")) {
+        // Khởi tạo SessionManager
+        sessionManager = new SessionManager(this);
+
+        etUsername = findViewById(R.id.edtTen_dang_nhap);
+        etPassword = findViewById(R.id.edtmatkhau);
+        btnLogin = findViewById(R.id.btndang_nhap);
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String username = etUsername.getText().toString().trim();
+                String password = etPassword.getText().toString().trim();
+
+                if ("admin".equals(username) && "admin".equals(password)) {
+                    Log.d(TAG, "Login successful for admin");
+                    // Lưu userId vào SessionManager (giả định userId = 1 cho admin)
+                    sessionManager.createLoginSession(1);
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    // Có thể chuyển sang màn hình khác ở đây
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Sai tên hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
+                    Log.w(TAG, "Login failed: Invalid credentials");
+                    Toast.makeText(LoginActivity.this, "Tên người dùng hoặc mật khẩu không đúng!", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
-        btndang_ky.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });
     }
 }
