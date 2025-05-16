@@ -1,3 +1,4 @@
+Xuanson
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="130dp"
@@ -65,6 +66,38 @@
         android:textAlignment="center"
         android:textStyle="bold"
         android:maxLines="1"
-        android:ellipsize="end"
+        anodroid:ellipsize="end"
         android:paddingTop="4dp" />
 </LinearLayout>
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="80dp"
+    android:layout_height="146dp"
+    android:orientation="vertical"
+    android:layout_marginEnd="8dp"
+    android:background="@drawable/bg_item_book"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/img_book_cover"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bat_dau"
+        android:background="@drawable/bg_item_book"
+        android:clipToOutline="true"/>
+
+    <TextView
+        android:id="@+id/tv_book_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tên sách"
+        android:textSize="12sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="4dp"/>
+</LinearLayout>
+app
