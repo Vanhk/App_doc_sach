@@ -31,6 +31,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+ Xuanson
+
+
+ app
             android:contentDescription="BookMark"
             android:background="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -49,13 +53,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+ Xuanson
+            app:srcCompat="@drawable/sach3" />
+
             app:srcCompat="@drawable/img_2023_" />
+ app
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+ Xuanson
+            android:layout_marginTop="56dp"
+
             android:layout_marginTop="52dp"
+ app
             android:text="Chương"
             android:textColor="@color/Chuong"
             android:textSize="25dp"
@@ -78,7 +90,10 @@
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imgBook"
-            app:layout_constraintVertical_bias="0.208" />
+ Xuanson
+            app:layout_constraintVertical_bias="0.098" />
+app
+            app:layout_constraintVertical_bias="0.208" />>>>>>> app
 
         <Button
             android:id="@+id/button2"

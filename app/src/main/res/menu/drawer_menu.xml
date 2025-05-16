@@ -1,3 +1,31 @@
+ Xuanson
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_my_books"
+
+        android:title="Sách của tôi" />
+    <item
+        android:id="@+id/nav_continue_reading"
+
+        android:title="Đọc tiếp" />
+    <item
+        android:id="@+id/nav_favorite_books"
+
+        android:title="Sách yêu thích" />
+    <item
+        android:id="@+id/nav_export"
+
+        android:title="Đăng xuất" />
+    <item
+        android:id="@+id/nav_settings"
+
+        android:title="Cài đặt" />
+    <item
+        android:id="@+id/nav_about"
+
+        android:title="About" />
+
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_my_books" android:title="Sách của tôi" />
     <item android:id="@+id/menu_continue" android:title="Đọc tiếp" />
@@ -5,4 +33,5 @@
     <item android:id="@+id/menu_logout" android:title="Đăng xuất" />
     <item android:id="@+id/menu_settings" android:title="Cài đặt" />
     <item android:id="@+id/menu_about" android:title="About" />
+ app
 </menu>

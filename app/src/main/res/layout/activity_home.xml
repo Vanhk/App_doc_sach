@@ -5,7 +5,12 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+ Xuanson
+    android:fitsSystemWindows="true"
+    tools:context=".view.activity.HomeActivity">
+
     tools:context=".MainActivity">
+ app
 
     <!-- Nội dung chính -->
     <LinearLayout
@@ -14,6 +19,55 @@
         android:layout_height="match_parent"
         android:background="#F0CFFF">
 
+
+ Xuanson
+        <!-- Toolbar thay cho LinearLayout -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#F0CFFF"
+            app:titleTextColor="@android:color/black">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Xin chào, Anh"
+                    android:textStyle="bold"
+                    android:layout_marginRight="40dp"
+                    android:textSize="18sp"
+                    android:layout_weight="1"
+                    android:gravity="center" />
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/dang_nhap" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="334dp"
+            android:layout_height="54dp"
+            android:hint="  Search by title, author, genre"
+            android:drawableLeft="@drawable/search_ic"
+            android:paddingStart="12dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:layout_margin="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,27 +106,49 @@
         android:background="@drawable/bg_search_bar"
         android:gravity="center_vertical"
         android:layout_gravity="center"/>
+app
 
         <!-- Sách của tôi -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+ Xuanson
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:weightSum="3">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="27dp"
+                android:layout_weight="2"
+
             android:paddingHorizontal="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+ app
                 android:text="Sách của tôi"
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
             <TextView
+ Xuanson
+                android:layout_width="25dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:paddingRight="5dp"
+                android:text="Xem tất cả"
+                android:textStyle="bold" />
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:text="Xem tất cả"
                 android:gravity="end"
                 android:paddingRight="5dp"/>
+ app
         </LinearLayout>
 
         <!-- Bộ lọc thể loại -->
@@ -80,14 +156,94 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
+ Xuanson
+            android:layout_marginStart="12dp">
+
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
             android:overScrollMode="never"
-            android:scrollbars="none">
+            android:scrollbars="none"> app
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+Xuanson
+                android:orientation="horizontal"
+                android:paddingEnd="12dp">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Hài hước"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Kinh dị"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Thiếu nhi"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Học tập"
+                    android:textSize="15sp"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- Nút test -->
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Khoa học"
+                    android:textSize="15sp"
+                    android:layout_marginEnd="8dp" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerMyBooks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingBottom="8dp"
+                    />
+
+
+                <FrameLayout
+                    android:layout_width="130dp"
+                    android:layout_height="180dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/rounded_rectangle"
+                    android:clipToOutline="true">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="40dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_add"/>
+
                 android:orientation="horizontal">
 
                 <!-- Các nút có cùng minWidth và bo góc nếu cần -->
@@ -176,9 +332,41 @@
                         android:src="@drawable/add_ic"
                         android:layout_gravity="center"
                          />
+app
                 </FrameLayout>
             </LinearLayout>
         </HorizontalScrollView>
+
+ Xuanson
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:weightSum="3">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="27dp"
+                android:layout_weight="2"
+                android:text="Đọc tiếp"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="25dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:paddingRight="5dp"
+                android:text="Xem tất cả"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <!-- Đọc tiếp -->
         <TextView
@@ -193,19 +381,63 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none">
-
+app
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
+Xuanson
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerReadingProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingBottom="8dp"
+                    />
+
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="12dp">
 
                 <include layout="@layout/item_book" />
                 <include layout="@layout/item_book" />
+app
             </LinearLayout>
         </HorizontalScrollView>
 
         <!-- Sách yêu thích -->
+ Xuanson
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:weightSum="3">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="27dp"
+                android:layout_weight="2"
+                android:text="Sách yêu thích"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="25dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:paddingRight="5dp"
+                android:text="Xem tất cả"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -218,14 +450,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp">
+ app
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
+ Xuanson
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerMyFavoriteBooks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingBottom="8dp"
+                    />
+
                 <include layout="@layout/item_book" />
                 <include layout="@layout/item_book" />
+app
             </LinearLayout>
         </HorizontalScrollView>
     </LinearLayout>
