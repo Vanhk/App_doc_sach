@@ -123,7 +123,7 @@
                         android:text="Tiếp tục đọc"
                         android:textColor="#ffffff"
                         android:backgroundTint="@color/blue"
-                        android:background="@drawable/rounded_button"
+                        android:background="@drawable/ripple_effect"
                         android:textSize="13dp"
                         tools:ignore="TextSizeCheck,TouchTargetSizeCheck" />
 
@@ -136,7 +136,7 @@
                         android:text="Đọc từ đầu"
                         android:textColor="#ffffff"
                         android:backgroundTint="@color/blue"
-                        android:background="@drawable/rounded_button"
+                        android:background="@drawable/ripple_effect"
                         android:textSize="13dp"
                         tools:ignore="TextSizeCheck,TouchTargetSizeCheck" />
 

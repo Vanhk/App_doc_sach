@@ -45,9 +45,9 @@
                     android:layout_height="30dp"
                     android:src="@drawable/dang_nhap" />
             </LinearLayout>
-            </androidx.appcompat.widget.Toolbar>
+        </androidx.appcompat.widget.Toolbar>
 
-            <AutoCompleteTextView
+        <AutoCompleteTextView
             android:id="@+id/search_bar"
             android:layout_width="334dp"
             android:layout_height="54dp"
@@ -64,6 +64,7 @@
             android:completionThreshold="1"
             android:dropDownHeight="wrap_content"
             android:dropDownWidth="334dp"/>
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -100,72 +101,19 @@
 
                 <!-- Bộ lọc thể loại -->
                 <HorizontalScrollView
+                    android:id="@+id/genreFilterScrollView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
-                    android:layout_marginStart="12dp">
+                    android:layout_marginStart="12dp"
+                    tools:ignore="SpeakableTextPresentCheck">
 
                     <LinearLayout
+                        android:id="@+id/genreFilterContainer"
                         android:layout_width="wrap_content"
                         android:layout_height="45dp"
                         android:orientation="horizontal"
-                        android:paddingEnd="12dp">
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:text="Hài hước"
-                            android:textAllCaps="false"
-                            android:textColor="#ffffff"
-                            android:backgroundTint="@color/blue"
-                            android:background="@drawable/rounded_button"
-                            android:textSize="15sp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:backgroundTint="@color/blue"
-                            android:background="@drawable/rounded_button"
-                            android:text="Kinh dị"
-                            android:textAllCaps="false"
-                            android:textColor="#ffffff"
-                            android:textSize="15sp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:textColor="#ffffff"
-                            android:backgroundTint="@color/blue"
-                            android:textAllCaps="false"
-                            android:background="@drawable/rounded_button"
-                            android:text="Thiếu nhi"
-                            android:textSize="15sp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Học tập"
-                            android:textSize="15sp"
-                            android:textColor="#ffffff"
-                            android:textAllCaps="false"
-                            android:backgroundTint="@color/blue"
-                            android:background="@drawable/rounded_button"
-                            android:layout_marginEnd="8dp" />
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Khoa học"
-                            android:textColor="#ffffff"
-                            android:textAllCaps="false"
-                            android:backgroundTint="@color/blue"
-                            android:background="@drawable/rounded_button"
-                            android:textSize="15sp"
-                            android:layout_marginEnd="8dp" />
-                    </LinearLayout>
+                        android:paddingEnd="12dp" />
                 </HorizontalScrollView>
 
                 <HorizontalScrollView

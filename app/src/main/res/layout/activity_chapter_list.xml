@@ -85,7 +85,7 @@
             android:textSize="25dp"
             android:textColor="#ffffff"
             android:backgroundTint="@color/blue"
-            android:background="@drawable/rounded_button"
+            android:background="@drawable/ripple_effect"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

@@ -14,7 +14,9 @@ import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -24,6 +26,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -52,7 +55,7 @@ public class HomeActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private RecyclerView recyclerMyBooks, recyclerReadingProgress, recyclerMyFavoriteBooks;
     private BookAdapter myBooksAdapter, readingProgressAdapter, favoriteBooksAdapter;
-    private List<Book> myBooksList, readingProgressList, favoriteBooksList;
+    private List<Book> myBooksList, filteredMyBooksList, readingProgressList, favoriteBooksList;
     private BookController bookController;
     private ReadingProgressDAO readingProgressDAO;
     private NavigationView navigationView;
@@ -62,6 +65,9 @@ public class HomeActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> activityResultLauncher;
     private AutoCompleteTextView searchBar;
     private List<String> suggestionList;
+    private LinearLayout genreFilterContainer;
+    private String selectedGenre = "All"; // Thể loại đang được chọn
+    private List<Button> genreButtons = new ArrayList<>(); // Lưu danh sách các nút thể loại
 
     private BroadcastReceiver favoriteChangeReceiver = new BroadcastReceiver() {
         @Override
@@ -102,6 +108,7 @@ public class HomeActivity extends AppCompatActivity {
         recyclerReadingProgress = findViewById(R.id.recyclerReadingProgress);
         recyclerMyFavoriteBooks = findViewById(R.id.recyclerMyFavoriteBooks);
         ImageView btAddHome = findViewById(R.id.bt_addhome);
+        genreFilterContainer = findViewById(R.id.genreFilterContainer);
 
         // Khởi tạo controller và DAO
         BookDAO bookDAO = new BookDAO(this);
@@ -109,7 +116,11 @@ public class HomeActivity extends AppCompatActivity {
         readingProgressDAO = new ReadingProgressDAO(this);
         sharedPreferences = getSharedPreferences("Favorites", MODE_PRIVATE);
 
-        // Khởi tạo suggestionList
+        // Khởi tạo danh sách
+        myBooksList = new ArrayList<>();
+        filteredMyBooksList = new ArrayList<>();
+        readingProgressList = new ArrayList<>();
+        favoriteBooksList = new ArrayList<>();
         suggestionList = new ArrayList<>();
         updateSuggestions();
         ArrayAdapter<String> suggestionAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, suggestionList);
@@ -118,8 +129,7 @@ public class HomeActivity extends AppCompatActivity {
         // Cấu hình RecyclerView
         LinearLayoutManager myBooksLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerMyBooks.setLayoutManager(myBooksLayoutManager);
-        myBooksList = new ArrayList<>();
-        myBooksAdapter = new BookAdapter(myBooksList, book -> {
+        myBooksAdapter = new BookAdapter(filteredMyBooksList, book -> {
             Intent intent = new Intent(HomeActivity.this, BookDetailActivity.class);
             intent.putExtra("book_id", book.getBookId());
             intent.putExtra("list_type", "my_books");
@@ -132,7 +142,6 @@ public class HomeActivity extends AppCompatActivity {
 
         LinearLayoutManager readingProgressLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerReadingProgress.setLayoutManager(readingProgressLayoutManager);
-        readingProgressList = new ArrayList<>();
         readingProgressAdapter = new BookAdapter(readingProgressList, book -> {
             Intent intent = new Intent(HomeActivity.this, BookDetailActivity.class);
             intent.putExtra("book_id", book.getBookId());
@@ -146,7 +155,6 @@ public class HomeActivity extends AppCompatActivity {
 
         LinearLayoutManager favoriteBooksLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerMyFavoriteBooks.setLayoutManager(favoriteBooksLayoutManager);
-        favoriteBooksList = new ArrayList<>();
         favoriteBooksAdapter = new BookAdapter(favoriteBooksList, book -> {
             Intent intent = new Intent(HomeActivity.this, BookDetailActivity.class);
             intent.putExtra("book_id", book.getBookId());
@@ -174,7 +182,9 @@ public class HomeActivity extends AppCompatActivity {
                         filteredBooks.add(book);
                     }
                 }
-                myBooksAdapter.updateData(filteredBooks);
+                filteredMyBooksList.clear();
+                filteredMyBooksList.addAll(filteredBooks);
+                myBooksAdapter.updateData(filteredMyBooksList);
             }
 
             @Override
@@ -287,7 +297,6 @@ public class HomeActivity extends AppCompatActivity {
             } else if (id == R.id.nav_settings) {
                 // Xử lý settings
             } else if (id == R.id.nav_about) {
-                // Hiển thị thông tin nhóm sinh viên và đề tài bằng dialog
                 StringBuilder aboutMessage = new StringBuilder();
                 aboutMessage.append("TRƯỜNG ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI\n");
                 aboutMessage.append("TRƯỜNG CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG\n");
@@ -338,8 +347,9 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 });
 
-        // Load dữ liệu
+        // Load dữ liệu và thiết lập bộ lọc thể loại
         loadData();
+        setupGenreFilters();
     }
 
     @Override
@@ -347,6 +357,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         Log.d(TAG, "onResume called, reloading data");
         loadData();
+        setupGenreFilters();
     }
 
     public void loadData() {
@@ -360,7 +371,6 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             Log.e(TAG, "Failed to load all books");
         }
-        myBooksAdapter.updateData(myBooksList);
 
         // Load Sách đọc dở
         readingProgressList.clear();
@@ -404,6 +414,80 @@ public class HomeActivity extends AppCompatActivity {
         suggestionAdapter.clear();
         suggestionAdapter.addAll(suggestionList);
         suggestionAdapter.notifyDataSetChanged();
+
+        // Lọc sách theo thể loại
+        filterBooksByGenre();
+    }
+
+    private void setupGenreFilters() {
+        // Lấy danh sách thể loại duy nhất từ bảng Book
+        Set<String> genresSet = new HashSet<>();
+        genresSet.add("All");
+        for (Book book : myBooksList) {
+            if (book.getGenre() != null && !book.getGenre().isEmpty()) {
+                genresSet.add(book.getGenre());
+            }
+        }
+        List<String> genres = new ArrayList<>(genresSet);
+        Collections.sort(genres);
+
+        // Xóa các nút cũ trong container
+        genreFilterContainer.removeAllViews();
+        genreButtons.clear();
+
+        // Tạo nút cho từng thể loại
+        for (String genre : genres) {
+            Button genreButton = new Button(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 24, 0);
+            genreButton.setLayoutParams(params);
+            genreButton.setText(genre);
+            genreButton.setTextSize(15);
+            genreButton.setTextColor(getResources().getColor(android.R.color.white));
+            genreButton.setAllCaps(false);
+            genreButton.setPadding(32, 16, 32, 16); // Tăng padding để nút dài ra theo text
+            genreButton.setBackgroundResource(R.drawable.ripple_effect); // Sử dụng ripple effect
+            // Đặt màu nền ban đầu
+            genreButton.setBackgroundTintList(ContextCompat.getColorStateList(this,R.color.blue));
+            // Nếu thể loại này đang được chọn, làm nổi bật nó
+            if (genre.equals(selectedGenre)) {
+                genreButton.setBackgroundTintList(ContextCompat.getColorStateList(this,R.color.blue_dam));
+            }
+
+            // Thiết lập sự kiện nhấn
+            genreButton.setOnClickListener(v -> {
+                selectedGenre = genre;
+                // Cập nhật màu nền của tất cả các nút
+                for (Button btn : genreButtons) {
+                    btn.setBackgroundTintList(ContextCompat.getColorStateList(this,R.color.blue));
+                }
+                genreButton.setBackgroundTintList(ContextCompat.getColorStateList(this,R.color.blue_dam));
+                filterBooksByGenre();
+            });
+
+            genreButtons.add(genreButton);
+            genreFilterContainer.addView(genreButton);
+        }
+    }
+
+    private void filterBooksByGenre() {
+        filteredMyBooksList.clear();
+        String keyword = searchBar.getText().toString().trim().toLowerCase();
+        for (Book book : myBooksList) {
+            boolean matchesGenre = selectedGenre.equals("All") || (book.getGenre() != null && book.getGenre().equals(selectedGenre));
+            boolean matchesSearch = keyword.isEmpty() ||
+                    book.getTitle().toLowerCase().contains(keyword) ||
+                    (book.getAuthor() != null && book.getAuthor().toLowerCase().contains(keyword)) ||
+                    (book.getGenre() != null && book.getGenre().toLowerCase().contains(keyword));
+            if (matchesGenre && matchesSearch) {
+                filteredMyBooksList.add(book);
+            }
+        }
+        Log.d(TAG, "Filtered books by genre " + selectedGenre + ": " + filteredMyBooksList.size());
+        myBooksAdapter.updateData(filteredMyBooksList);
     }
 
     private void updateSuggestions() {

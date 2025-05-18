@@ -278,20 +278,35 @@ public class BookDetailActivity extends AppCompatActivity {
         intent.putExtra("user_id", userId);
         startActivity(intent);
     }
-
     private void navigateBack() {
-        Intent intent;
-        if (fromHome || "my_books".equals(listType) || "reading_progress".equals(listType) || "favorite_books".equals(listType)) {
-            intent = new Intent(this, HomeActivity.class);
+        if (fromHome) {
+            // Nếu đến từ HomeActivity, quay lại HomeActivity
+            Intent intent = new Intent(BookDetailActivity.this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
         } else {
-            intent = new Intent(this, BookListActivity.class);
+            // Nếu không đến từ HomeActivity, quay lại BookListActivity với listType tương ứng
+            Intent intent = new Intent(this, BookListActivity.class);
             intent.putExtra("list_type", listType);
             intent.putExtra("user_id", userId);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
         }
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
         finish();
     }
+//    private void navigateBack() {
+//        Intent intent;
+//        if (fromHome || "my_books".equals(listType) || "reading_progress".equals(listType) || "favorite_books".equals(listType)) {
+//            intent = new Intent(this, HomeActivity.class);
+//        } else {
+//            intent = new Intent(this, BookListActivity.class);
+//            intent.putExtra("list_type", listType);
+//            intent.putExtra("user_id", userId);
+//        }
+//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        startActivity(intent);
+//        finish();
+//    }
 
     private void navigateToReadBook(int bookId, int chapterIdOrPage) {
         Book book = bookController.getBookById(bookId);
