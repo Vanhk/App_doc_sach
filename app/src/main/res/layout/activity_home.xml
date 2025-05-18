@@ -310,5 +310,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:menu="@menu/drawer_menu"
+        app:itemTextColor="@color/blue"
+        android:background="@drawable/background_chapter"
         app:headerLayout="@layout/drawer_header" />
 </androidx.drawerlayout.widget.DrawerLayout>

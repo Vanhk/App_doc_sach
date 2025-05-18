@@ -16,7 +16,7 @@ import com.example.appdocsachv2.utils.SessionManager;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private EditText etUsername, etPassword;
-    private Button btnLogin;
+    private Button btnLogin, btnregister;
     private SessionManager sessionManager;
 
     @Override
@@ -30,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         etUsername = findViewById(R.id.edtTen_dang_nhap);
         etPassword = findViewById(R.id.edtmatkhau);
         btnLogin = findViewById(R.id.btndang_nhap);
+        btnregister = findViewById(R.id.btndang_ky);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +51,12 @@ public class LoginActivity extends AppCompatActivity {
                     Log.w(TAG, "Login failed: Invalid credentials");
                     Toast.makeText(LoginActivity.this, "Tên người dùng hoặc mật khẩu không đúng!", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        btnregister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(LoginActivity.this, "Tên người dùng và mật khẩu là admin!", Toast.LENGTH_SHORT).show();
             }
         });
     }
