@@ -2,7 +2,6 @@ package com.example.appdocsachv2.view.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,6 @@ public class FavoriteBookAdapter extends RecyclerView.Adapter<FavoriteBookAdapte
         this.context = homeActivity;
         this.userId = userId;
         this.listener = listener;
-        Log.d(TAG, "FavoriteBookAdapter initialized for HomeActivity, userId: " + userId);
     }
 
     public FavoriteBookAdapter(List<Book> favoriteBookList, BookListActivity bookListActivity, int userId, OnItemClickListener listener) {
@@ -50,12 +48,10 @@ public class FavoriteBookAdapter extends RecyclerView.Adapter<FavoriteBookAdapte
         this.context = bookListActivity;
         this.userId = userId;
         this.listener = listener;
-        Log.d(TAG, "FavoriteBookAdapter initialized for BookListActivity, userId: " + userId);
     }
 
     public void updateData(List<Book> newFavoriteBooks) {
         this.favoriteBookList = (newFavoriteBooks != null) ? newFavoriteBooks : new ArrayList<>();
-        Log.d(TAG, "Updated favorite book list size: " + favoriteBookList.size());
         notifyDataSetChanged();
     }
 
@@ -70,17 +66,13 @@ public class FavoriteBookAdapter extends RecyclerView.Adapter<FavoriteBookAdapte
     public void onBindViewHolder(@NonNull FavoriteBookViewHolder holder, int position) {
         if (position < favoriteBookList.size()) {
             Book book = favoriteBookList.get(position);
-            Log.d(TAG, "Binding book at position " + position + ": " + (book != null ? book.getTitle() : "null"));
             holder.bind(book);
-        } else {
-            Log.e(TAG, "Invalid position: " + position + ", list size: " + favoriteBookList.size());
         }
     }
 
     @Override
     public int getItemCount() {
         int count = favoriteBookList.size();
-        Log.d(TAG, "Item count: " + count);
         return count;
     }
 
@@ -98,7 +90,6 @@ public class FavoriteBookAdapter extends RecyclerView.Adapter<FavoriteBookAdapte
 
         public void bind(final Book book) {
             if (book == null) {
-                Log.e(TAG, "Book is null at position: " + getAdapterPosition());
                 return;
             }
 
@@ -114,7 +105,6 @@ public class FavoriteBookAdapter extends RecyclerView.Adapter<FavoriteBookAdapte
             }
 
             View.OnClickListener openDetailListener = v -> {
-                Log.d(TAG, "Clicked on book: " + book.getTitle());
                 if (listener != null) {
                     listener.onItemClick(book);
                 }
@@ -136,7 +126,6 @@ public class FavoriteBookAdapter extends RecyclerView.Adapter<FavoriteBookAdapte
             btnFavorite.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    Log.d(TAG, "Removing favorite for book: " + book.getTitle());
                     if (homeActivity != null) {
                         homeActivity.removeFromFavorites(book.getBookId());
                         favoriteBookList.remove(position);

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -96,11 +95,9 @@ public class BookDetailActivity extends AppCompatActivity {
                 displayBookDetails();
                 loadRelatedBooks();
             } else {
-                Log.e(TAG, "Book not found with book_id: " + bookId);
                 finish();
             }
         } else {
-            Log.e(TAG, "Invalid book_id received");
             finish();
         }
 
@@ -128,7 +125,6 @@ public class BookDetailActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         userId = getIntent().getIntExtra("user_id", sessionManager.getUserId());
         if (userId == -1) {
-            Log.e(TAG, "User ID not found, defaulting to 1");
             userId = 1;
         }
     }
@@ -153,7 +149,6 @@ public class BookDetailActivity extends AppCompatActivity {
 
         btnTiepTuc.setOnClickListener(v -> {
             int lastReadPage = readingProgressDAO.getLastReadPage(userId, bookId);
-            Log.d(TAG, "Last read page for bookId " + bookId + " and userId " + userId + ": " + lastReadPage);
             navigateToReadBook(bookId, lastReadPage != -1 ? lastReadPage : 1);
         });
 
@@ -223,7 +218,6 @@ public class BookDetailActivity extends AppCompatActivity {
     private void updateFavoriteIcon() {
         imgFavorite.setImageResource(isFavorite(bookId) ?
                 R.drawable.baseline_bookmark_24 : R.drawable.icon_ionic_ios_bookmark);
-        Log.d(TAG, "Updated favorite icon for bookId " + bookId + " to " + (isFavorite(bookId) ? "bookmarked" : "unbookmarked"));
     }
 
     private boolean isFavorite(int bookId) {
@@ -232,14 +226,12 @@ public class BookDetailActivity extends AppCompatActivity {
 
     public List<Integer> getFavoriteBookIds() {
         String favoriteIds = sharedPreferences.getString(FAVORITES_KEY + userId, "");
-        Log.d(TAG, "Checking favorite IDs for user " + userId + ": " + favoriteIds);
         List<Integer> bookIds = new ArrayList<>();
         if (!favoriteIds.isEmpty()) {
             for (String id : favoriteIds.split(",")) {
                 try {
                     bookIds.add(Integer.parseInt(id.trim()));
                 } catch (NumberFormatException e) {
-                    Log.e(TAG, "Error parsing favorite book id: " + e.getMessage());
                 }
             }
         }
@@ -265,7 +257,6 @@ public class BookDetailActivity extends AppCompatActivity {
     private void saveFavoriteBookIds(List<Integer> bookIds) {
         String ids = android.text.TextUtils.join(",", bookIds);
         sharedPreferences.edit().putString(FAVORITES_KEY + userId, ids).apply();
-        Log.d(TAG, "Saved favorite IDs for user " + userId + ": " + ids);
     }
 
     // ==== Navigation helper methods ====

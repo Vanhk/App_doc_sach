@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -86,8 +85,6 @@ public class ChapterListActivity extends AppCompatActivity {
 
         String pdfPath = getIntent().getStringExtra("pdf_path");
         String bookTitle = getIntent().getStringExtra("book_title");
-        Log.d("ChapterListActivity", "pdfPath = " + pdfPath);
-        Log.d("ChapterListActivity", "bookTitle = " + bookTitle);
 
         if (pdfPath == null || pdfPath.isEmpty() || bookTitle == null) {
             Toast.makeText(this, "Dữ liệu sách không hợp lệ", Toast.LENGTH_SHORT).show();
@@ -224,14 +221,14 @@ public class ChapterListActivity extends AppCompatActivity {
                 Chapter chapter = chapterList.get(selectedChapterPosition);
                 startPage = safePageIndex(chapter.getStartPage());
                 endPage = safePageIndex(chapter.getEndPage());
-                chapterTitle = determineChapterTitleByPage(startPage);
+                chapterTitle = chapter.getTitle(); // Lấy tiêu đề trực tiếp từ chương đã chọn
             } else {
                 startPage = 0;
                 endPage = totalPages > 0 ? totalPages - 1 : 0;
-                chapterTitle = determineChapterTitleByPage(startPage);
+                chapterTitle = "Đọc từ đầu"; // Tiêu đề mặc định khi chưa chọn chương
             }
 
-            readIntent.putExtra("chapter_title", "Đọc từ đầu");
+            readIntent.putExtra("chapter_title", chapterTitle);
             readIntent.putExtra("start_page", startPage);
             readIntent.putExtra("end_page", endPage);
             startActivity(readIntent);

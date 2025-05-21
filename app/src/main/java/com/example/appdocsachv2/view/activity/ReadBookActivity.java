@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -69,16 +68,16 @@ public class ReadBookActivity extends AppCompatActivity {
         pdfPath = intent.getStringExtra("pdf_path");
         bookTitle = intent.getStringExtra("book_title");
         chapterTitle = intent.getStringExtra("chapter_title"); // Tiêu đề chương từ Intent
-        startPage = intent.getIntExtra("chapter_id", 0); // Sử dụng chapter_id từ Intent
+        startPage = intent.getIntExtra("start_page", 0); // Sửa key từ "chapter_id" thành "start_page"
         endPage = intent.getIntExtra("end_page", -1);
         totalPage = intent.getIntExtra("total_pages", 0);
         bookId = intent.getIntExtra("book_id", -1);
         userId = intent.getIntExtra("user_id", -1);
         currentPageIndex = startPage;
 
+
         // Kiểm tra userId
         if (userId == -1) {
-            Log.e("ReadBookActivity", "Invalid userId received");
             Toast.makeText(this, "Không thể xác định người dùng", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -86,7 +85,6 @@ public class ReadBookActivity extends AppCompatActivity {
 
         // Kiểm tra pdfPath
         if (pdfPath == null || pdfPath.isEmpty()) {
-            Log.e("ReadBookActivity", "Invalid pdfPath received");
             Toast.makeText(this, "Không thể tìm thấy file PDF", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -146,8 +144,11 @@ public class ReadBookActivity extends AppCompatActivity {
             pdfRenderer = new PdfRenderer(fileDescriptor);
             totalPage = pdfRenderer.getPageCount();
 
+            // Điều chỉnh startPage và endPage dựa trên totalPage
             if (startPage < 0 || startPage >= totalPage) startPage = 0;
             if (endPage >= totalPage || endPage == -1) endPage = totalPage - 1;
+
+
 
             showPage(currentPageIndex);
             // Cập nhật chương ngay khi mở nếu không có chapterTitle cụ thể
@@ -160,7 +161,6 @@ public class ReadBookActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             Toast.makeText(this, "Không thể mở file PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e("PDF", "Lỗi: " + e.getMessage());
         }
     }
 
@@ -199,12 +199,10 @@ public class ReadBookActivity extends AppCompatActivity {
 
     private void saveReadingProgress(int pageIndex) {
         if (bookId == -1 || userId == -1) {
-            Log.e("ReadBookActivity", "Cannot save reading progress: Invalid bookId or userId");
             return;
         }
 
         readingProgressDAO.insertOrUpdateReadingProgress(userId, bookId, pageIndex);
-        Log.d("ReadBookActivity", "Saved reading progress: userId=" + userId + ", bookId=" + bookId + ", page=" + pageIndex);
     }
 
     @Override
@@ -215,7 +213,6 @@ public class ReadBookActivity extends AppCompatActivity {
             if (pdfRenderer != null) pdfRenderer.close();
             if (fileDescriptor != null) fileDescriptor.close();
         } catch (IOException e) {
-            Log.e("PDF", "Lỗi đóng tài nguyên: " + e.getMessage());
         }
     }
 }

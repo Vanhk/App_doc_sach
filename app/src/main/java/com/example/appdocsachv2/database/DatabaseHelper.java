@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
@@ -124,18 +123,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     values.put(COLUMN_USERNAME, "admin");
                     values.put(COLUMN_PASSWORD, "admin"); // Mật khẩu mặc định
                     values.put(COLUMN_EMAIL, "admin@example.com");
-                    long result = db.insert(TABLE_USER, null, values);
-                    if (result != -1) {
-                        Log.d(TAG, "Added default admin user with ID: " + result);
-                    } else {
-                        Log.e(TAG, "Failed to add default admin user");
-                    }
                 }
                 cursor.close();
             }
-            Log.d(TAG, "Database tables created successfully");
         } catch (SQLiteException e) {
-            Log.e(TAG, "Error creating database tables: " + e.getMessage());
         }
     }
 

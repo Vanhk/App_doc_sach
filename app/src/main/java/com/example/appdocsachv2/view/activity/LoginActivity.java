@@ -2,7 +2,6 @@ package com.example.appdocsachv2.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
                 String password = etPassword.getText().toString().trim();
 
                 if ("admin".equals(username) && "admin".equals(password)) {
-                    Log.d(TAG, "Login successful for admin");
                     // Lưu userId vào SessionManager (giả định userId = 1 cho admin)
                     sessionManager.createLoginSession(1);
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
@@ -48,7 +46,6 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else {
-                    Log.w(TAG, "Login failed: Invalid credentials");
                     Toast.makeText(LoginActivity.this, "Tên người dùng hoặc mật khẩu không đúng!", Toast.LENGTH_SHORT).show();
                 }
             }

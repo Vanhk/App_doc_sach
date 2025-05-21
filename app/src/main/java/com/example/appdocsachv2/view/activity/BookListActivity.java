@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -34,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 public class BookListActivity extends AppCompatActivity {
-    private static final String TAG = "BookListActivity";
     private RecyclerView recyclerViewBooks;
     private BookAdapter bookAdapter;
     private List<Book> bookList;
@@ -63,14 +61,12 @@ public class BookListActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         userId = getIntent().getIntExtra("user_id", sessionManager.getUserId());
         if (userId == -1) {
-            Log.e(TAG, "User ID not found, redirecting to LoginActivity");
             Intent intent = new Intent(BookListActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
             return;
         }
-        Log.d(TAG, "User ID retrieved: " + userId);
 
         recyclerViewBooks = findViewById(R.id.recyclerBookList);
         ImageView btnBack = findViewById(R.id.btnBack);
@@ -98,7 +94,6 @@ public class BookListActivity extends AppCompatActivity {
         if (listType == null) listType = "my_books"; // Đảm bảo listType không null
         fromSearch = getIntent().getBooleanExtra("fromSearch", false);
         searchKeyword = getIntent().getStringExtra("search_keyword");
-        Log.d(TAG, "List type: " + listType + ", fromSearch: " + fromSearch + ", searchKeyword: " + searchKeyword);
 
         // Xác định xem có hiển thị icon yêu thích hay không
         boolean showFavoriteIcon = !listType.equals("my_books");
@@ -108,7 +103,6 @@ public class BookListActivity extends AppCompatActivity {
             intent.putExtra("list_type", listType);
             intent.putExtra("fromHome", false);
             intent.putExtra("user_id", userId);
-            Log.d(TAG, "Navigating to BookDetailActivity with book_id: " + book.getBookId() + ", listType: " + listType + ", fromHome: false");
             startActivity(intent);
         }, this, showFavoriteIcon, bookController, userId);
         recyclerViewBooks.setAdapter(bookAdapter);
@@ -184,7 +178,6 @@ public class BookListActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedAuthor = authors.get(position);
-                Log.d(TAG, "Selected author: " + selectedAuthor);
                 filterBooks();
             }
 
@@ -200,7 +193,6 @@ public class BookListActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedGenre = genres.get(position);
-                Log.d(TAG, "Selected genre: " + selectedGenre);
                 filterBooks();
             }
 
@@ -232,7 +224,6 @@ public class BookListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume called, reloading books");
         loadBooks();
     }
 
@@ -240,22 +231,16 @@ public class BookListActivity extends AppCompatActivity {
         bookList.clear();
         if (listType.equals("reading_progress")) {
             List<ReadingProgress> progressList = readingProgressDAO.getReadingProgress(userId);
-            Log.d(TAG, "Fetched " + (progressList != null ? progressList.size() : 0) + " reading progress records for userId: " + userId);
             if (progressList != null) {
                 for (ReadingProgress progress : progressList) {
                     Book book = bookController.getBookById(progress.getBookId());
                     if (book != null) {
                         bookList.add(book);
-                        Log.d(TAG, "Added book to reading progress: " + book.getTitle());
-                    } else {
-                        Log.e(TAG, "Book not found for progress with bookId: " + progress.getBookId());
                     }
                 }
             }
-            Log.d(TAG, "Loaded " + bookList.size() + " reading progress books");
         } else if (listType.equals("favorite_books")) {
             List<Integer> favoriteBookIds = getFavoriteBookIds();
-            Log.d(TAG, "Favorite book IDs size: " + (favoriteBookIds != null ? favoriteBookIds.size() : 0));
             if (favoriteBookIds != null) {
                 for (int bookId : favoriteBookIds) {
                     Book book = bookController.getBookById(bookId);
@@ -270,7 +255,6 @@ public class BookListActivity extends AppCompatActivity {
                 bookList.addAll(allBooks);
             }
         }
-        Log.d(TAG, "Loaded book list size: " + bookList.size());
 
         // Cập nhật lại danh sách author và genre khi load sách mới
         ArrayAdapter<String> authorAdapter = (ArrayAdapter<String>) spinnerAuthor.getAdapter();
@@ -278,14 +262,12 @@ public class BookListActivity extends AppCompatActivity {
         List<String> authors = getUniqueAuthors();
         authorAdapter.addAll(authors);
         authorAdapter.notifyDataSetChanged();
-        Log.d(TAG, "Authors list size: " + authors.size());
 
         ArrayAdapter<String> genreAdapter = (ArrayAdapter<String>) spinnerGenre.getAdapter();
         genreAdapter.clear();
         List<String> genres = getUniqueGenres();
         genreAdapter.addAll(genres);
         genreAdapter.notifyDataSetChanged();
-        Log.d(TAG, "Genres list size: " + genres.size());
 
         // Đặt lại selectedAuthor và selectedGenre nếu không còn trong danh sách
         if (!authors.contains(selectedAuthor)) {
@@ -326,7 +308,6 @@ public class BookListActivity extends AppCompatActivity {
         }
         suggestionList.addAll(suggestions);
         Collections.sort(suggestionList);
-        Log.d(TAG, "Suggestions list size: " + suggestionList.size());
     }
 
     private List<String> getUniqueAuthors() {
@@ -375,16 +356,13 @@ public class BookListActivity extends AppCompatActivity {
                 filteredBookList.add(book);
             }
         }
-        Log.d(TAG, "Filtered book list size: " + filteredBookList.size());
         bookAdapter.updateData(filteredBookList);
     }
 
     public List<Integer> getFavoriteBookIds() {
         SharedPreferences sharedPreferences = getSharedPreferences("Favorites", MODE_PRIVATE);
         String favoriteIds = sharedPreferences.getString("favorite_book_ids_user_" + userId, "");
-        Log.d(TAG, "Fetched favorite IDs for user " + userId + ": " + favoriteIds);
         if (favoriteIds.isEmpty()) {
-            Log.d(TAG, "No favorite book IDs found for user " + userId);
             return new ArrayList<>();
         }
         String[] ids = favoriteIds.split(",");
@@ -393,35 +371,26 @@ public class BookListActivity extends AppCompatActivity {
             try {
                 bookIds.add(Integer.parseInt(id.trim()));
             } catch (NumberFormatException e) {
-                Log.e(TAG, "Error parsing favorite book id: " + e.getMessage());
             }
         }
         return bookIds;
     }
 
     public void addToFavorites(int bookId) {
-        Log.d(TAG, "Adding bookId " + bookId + " to favorites for user " + userId);
         List<Integer> favoriteBookIds = getFavoriteBookIds();
         if (!favoriteBookIds.contains(bookId)) {
             favoriteBookIds.add(bookId);
             saveFavoriteBookIds(favoriteBookIds);
             loadBooks();
-            Log.d(TAG, "Added bookId " + bookId + " to favorites");
-        } else {
-            Log.d(TAG, "BookId " + bookId + " already in favorites");
         }
     }
 
     public void removeFromFavorites(int bookId) {
-        Log.d(TAG, "Removing bookId " + bookId + " from favorites for user " + userId);
         List<Integer> favoriteBookIds = getFavoriteBookIds();
         if (favoriteBookIds.contains(bookId)) {
             favoriteBookIds.remove(Integer.valueOf(bookId));
             saveFavoriteBookIds(favoriteBookIds);
             loadBooks();
-            Log.d(TAG, "Removed bookId " + bookId + " from favorites");
-        } else {
-            Log.d(TAG, "BookId " + bookId + " not found in favorites");
         }
     }
 
@@ -429,6 +398,5 @@ public class BookListActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("Favorites", MODE_PRIVATE);
         String ids = android.text.TextUtils.join(",", bookIds);
         sharedPreferences.edit().putString("favorite_book_ids_user_" + userId, ids).apply();
-        Log.d(TAG, "Saved favorite book IDs for user " + userId + ": " + ids);
     }
 }
