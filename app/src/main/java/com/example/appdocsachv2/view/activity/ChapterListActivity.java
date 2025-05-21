@@ -235,18 +235,6 @@ public class ChapterListActivity extends AppCompatActivity {
         });
     }
 
-    private String determineChapterTitleByPage(int pageIndex) {
-        if (chapterList == null || chapterList.isEmpty()) {
-            return "Không có chương";
-        }
-
-        for (Chapter chapter : chapterList) {
-            if (pageIndex >= chapter.getStartPage() && pageIndex <= chapter.getEndPage()) {
-                return chapter.getTitle();
-            }
-        }
-        return "Chưa thuộc chương nào";
-    }
 
     private void onChapterClick(Chapter chapter) {
         selectedChapterPosition = chapterList.indexOf(chapter);

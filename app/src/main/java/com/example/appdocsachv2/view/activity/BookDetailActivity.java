@@ -149,7 +149,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
         btnTiepTuc.setOnClickListener(v -> {
             int lastReadPage = readingProgressDAO.getLastReadPage(userId, bookId);
-            navigateToReadBook(bookId, lastReadPage != -1 ? lastReadPage : 1);
+            navigateToReadBook(bookId, lastReadPage != -1 ? lastReadPage : 0); // Sửa mặc định thành 0
         });
 
         btnDocTuDau.setOnClickListener(v -> {
@@ -269,6 +269,7 @@ public class BookDetailActivity extends AppCompatActivity {
         intent.putExtra("user_id", userId);
         startActivity(intent);
     }
+
     private void navigateBack() {
         if (fromHome) {
             // Nếu đến từ HomeActivity, quay lại HomeActivity
@@ -285,19 +286,6 @@ public class BookDetailActivity extends AppCompatActivity {
         }
         finish();
     }
-//    private void navigateBack() {
-//        Intent intent;
-//        if (fromHome || "my_books".equals(listType) || "reading_progress".equals(listType) || "favorite_books".equals(listType)) {
-//            intent = new Intent(this, HomeActivity.class);
-//        } else {
-//            intent = new Intent(this, BookListActivity.class);
-//            intent.putExtra("list_type", listType);
-//            intent.putExtra("user_id", userId);
-//        }
-//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//        startActivity(intent);
-//        finish();
-//    }
 
     private void navigateToReadBook(int bookId, int chapterIdOrPage) {
         Book book = bookController.getBookById(bookId);
@@ -307,10 +295,11 @@ public class BookDetailActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(this, ReadBookActivity.class);
         intent.putExtra("book_id", bookId);
-        intent.putExtra("chapter_id", chapterIdOrPage);
+        intent.putExtra("start_page", chapterIdOrPage); // Sửa key thành "start_page"
         intent.putExtra("user_id", userId);
         intent.putExtra("pdf_path", book.getFilePath());
         intent.putExtra("book_title", book.getTitle());
+        intent.putExtra("total_pages", book.getTotal_pages()); // Thêm total_pages
         startActivity(intent);
     }
 
