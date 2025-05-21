@@ -115,14 +115,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(CREATE_TABLE_FAVORITE_BOOK);
             db.execSQL(CREATE_TABLE_READING_PROGRESS);
 
-            // Thêm tài khoản admin mặc định nếu chưa tồn tại
             Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_USER + " WHERE " + COLUMN_USERNAME + " = ?", new String[]{"admin"});
             if (cursor != null) {
                 if (cursor.moveToFirst() && cursor.getInt(0) == 0) {
                     ContentValues values = new ContentValues();
                     values.put(COLUMN_USERNAME, "admin");
-                    values.put(COLUMN_PASSWORD, "admin"); // Mật khẩu mặc định
+                    values.put(COLUMN_PASSWORD, "admin");
                     values.put(COLUMN_EMAIL, "admin@example.com");
+                    db.insert(TABLE_USER, null, values);
                 }
                 cursor.close();
             }

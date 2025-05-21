@@ -54,7 +54,7 @@ public class BookController {
             return false;
         }
         bookDAO.deleteBook(bookId);
-        removeFavorite(bookId); // Xoá khỏi danh sách yêu thích nếu có
+        removeFavorite(bookId);
         return true;
     }
 
@@ -73,16 +73,6 @@ public class BookController {
         return book;
     }
 
-    // ========================
-    // QUẢN LÝ YÊU THÍCH
-    // ========================
-
-    public void addFavorite(int bookId) {
-        Set<String> favorites = getFavoriteSet();
-        favorites.add(String.valueOf(bookId));
-        saveFavoriteSet(favorites);
-    }
-
     public void removeFavorite(int bookId) {
         Set<String> favorites = getFavoriteSet();
         favorites.remove(String.valueOf(bookId));
@@ -94,31 +84,6 @@ public class BookController {
         return isFavorite;
     }
 
-    public List<Book> getFavoriteBooks() {
-        List<Book> result = new ArrayList<>();
-        Set<String> favoriteIds = getFavoriteSet();
-        if (favoriteIds.isEmpty()) {
-            return result;
-        }
-
-        // Tối ưu: Lấy tất cả sách một lần rồi lọc
-        List<Book> allBooks = getAllBooks();
-        if (allBooks != null) {
-            for (String idStr : favoriteIds) {
-                try {
-                    int id = Integer.parseInt(idStr);
-                    for (Book book : allBooks) {
-                        if (book.getBookId() == id) {
-                            result.add(book);
-                            break;
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                }
-            }
-        }
-        return result;
-    }
 
     private Set<String> getFavoriteSet() {
         Set<String> favorites = sharedPreferences.getStringSet(KEY_FAVORITES, new HashSet<>());
