@@ -258,6 +258,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:menu="@menu/drawer_menu"
+        app:itemTextAppearance="@style/NavigationViewStyle"
         app:itemTextColor="@color/blue"
         android:background="@drawable/background_chapter"
         app:headerLayout="@layout/drawer_header" />
