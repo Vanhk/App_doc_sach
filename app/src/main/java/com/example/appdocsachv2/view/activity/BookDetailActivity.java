@@ -56,6 +56,7 @@ public class BookDetailActivity extends AppCompatActivity {
     public static final String ACTION_FAVORITE_CHANGED = "com.example.appdocsachv2.FAVORITE_CHANGED";
     public static final String EXTRA_BOOK_ID = "book_id";
 
+//Lắng nghe thay đổi trạng thái yêu thích từ các Activity khác và cập nhật giao diện
     private BroadcastReceiver favoriteChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -128,13 +129,13 @@ public class BookDetailActivity extends AppCompatActivity {
             userId = 1;
         }
     }
-
+//Lấy listType và fromHome từ Intent
     private void getIntentData() {
         listType = getIntent().getStringExtra("list_type");
         if (listType == null) listType = "default";
         fromHome = getIntent().getBooleanExtra("fromHome", false);
     }
-
+//Thiết lập RecyclerView với GridLayoutManager (3 cột) và adapter cho sách liên quan
     private void setupRelatedBooksAdapter() {
         relatedBooksList = new ArrayList<>();
         relatedBooksAdapter = new BookAdapter(relatedBooksList, book -> {
@@ -186,14 +187,14 @@ public class BookDetailActivity extends AppCompatActivity {
         txtTacGia.setText(nonNull(currentBook.getAuthor(), "Không có tác giả"));
         txtTheLoai.setText(nonNull(currentBook.getGenre(), "Không có thể loại"));
         txtNoiDungTomTat.setText(nonNull(currentBook.getSummary(), "Không có tóm tắt"));
-
+// sử dụng Glide để tải ảnh bìa
         if (currentBook.getCoverImage() != null && !currentBook.getCoverImage().isEmpty()) {
             Glide.with(this).load(currentBook.getCoverImage()).placeholder(R.drawable.noimage).into(imgBook);
         } else {
             imgBook.setImageResource(R.drawable.noimage);
         }
     }
-
+//lấy tối đa 6 sách cùng thể loại
     private void loadRelatedBooks() {
         if (currentBook != null && currentBook.getGenre() != null) {
             relatedBooksList.clear();
@@ -259,8 +260,8 @@ public class BookDetailActivity extends AppCompatActivity {
         sharedPreferences.edit().putString(FAVORITES_KEY + userId, ids).apply();
     }
 
-    // ==== Navigation helper methods ====
-
+    // Navigation helper methods
+// mở chi tiết sách khi click vào sách khác cùng thể loại
     private void navigateToBookDetail(int bookId) {
         Intent intent = new Intent(this, BookDetailActivity.class);
         intent.putExtra("book_id", bookId);
@@ -286,7 +287,7 @@ public class BookDetailActivity extends AppCompatActivity {
         }
         finish();
     }
-
+//Chuyển đến ReadBookActivity với trang bắt đầu
     private void navigateToReadBook(int bookId, int chapterIdOrPage) {
         Book book = bookController.getBookById(bookId);
         if (book == null) {
@@ -295,14 +296,14 @@ public class BookDetailActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(this, ReadBookActivity.class);
         intent.putExtra("book_id", bookId);
-        intent.putExtra("start_page", chapterIdOrPage); // Sửa key thành "start_page"
+        intent.putExtra("start_page", chapterIdOrPage);
         intent.putExtra("user_id", userId);
         intent.putExtra("pdf_path", book.getFilePath());
         intent.putExtra("book_title", book.getTitle());
-        intent.putExtra("total_pages", book.getTotal_pages()); // Thêm total_pages
+        intent.putExtra("total_pages", book.getTotal_pages());
         startActivity(intent);
     }
-
+//chuyển đến chapterlist
     private void navigateToChapterList(int bookId) {
         Book book = bookController.getBookById(bookId);
         if (book == null) {

@@ -22,13 +22,13 @@ public class ReadingProgressDAO {
         dbHelper = new DatabaseHelper(context);
     }
 
-    public void open() {
-        dbHelper.getWritableDatabase();
-    }
-
-    public void close() {
-        dbHelper.close();
-    }
+//    public void open() {
+//        dbHelper.getWritableDatabase();
+//    }
+//
+//    public void close() {
+//        dbHelper.close();
+//    }
 
     public long insertOrUpdateReadingProgress(int userId, int bookId, int currentPage) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -36,12 +36,12 @@ public class ReadingProgressDAO {
         values.put(COLUMN_USER_ID, userId);
         values.put(COLUMN_BOOK_ID, bookId);
         values.put(COLUMN_CURRENT_PAGE, currentPage);
-
+//nếu có hàng đã tồn taij với cùng userid và book id thay thế bằng CONFLICT_REPLACE
         long id = db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
         return id;
     }
-
+//Lấy danh sách tất cả tiến trình đọc của một người dùng dựa trên userId.
     public List<ReadingProgress> getReadingProgress(int userId) {
         List<ReadingProgress> progressList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -60,7 +60,7 @@ public class ReadingProgressDAO {
         db.close();
         return progressList;
     }
-
+//Lấy trang cuối cùng mà người dùng đã đọc cho một cuốn sách cụ thể.
     public int getLastReadPage(int userId, int bookId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         int lastPage = -1;

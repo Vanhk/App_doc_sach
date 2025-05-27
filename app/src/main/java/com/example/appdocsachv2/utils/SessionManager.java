@@ -15,21 +15,21 @@ public class SessionManager {
         pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = pref.edit();
     }
-
+//Tạo một phiên đăng nhập mới khi người dùng đăng nhập thành công
     public void createLoginSession(int userId) {
         editor.putInt(KEY_USER_ID, userId);
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.apply();
     }
-
+//Lấy ID của người dùng hiện đang đăng nhập
     public int getUserId() {
         return pref.getInt(KEY_USER_ID, -1);
     }
-
+//Kiểm tra xem người dùng có đang đăng nhập hay không
     public boolean isLoggedIn() {
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
     }
-
+//Đăng xuất người dùng bằng cách xóa toàn bộ dữ liệu phiên
     public void logout() {
         editor.clear();
         editor.apply();

@@ -8,7 +8,7 @@ public class Book {
     private String filePath;
     private String coverImage;
     private int total_pages;
-    private String summary; // Thêm trường nội dung tóm tắt
+    private String summary;
 
     public Book() {
     }

@@ -27,34 +27,34 @@ public class ChapterDAO {
         return id;
     }
 
-    public boolean updateChapter(Chapter chapter) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("book_id", chapter.getBookId());
-        values.put("title", chapter.getTitle());
-        values.put("start_page", chapter.getStartPage());
-        values.put("end_page", chapter.getEndPage());
-        int rows = db.update("Chapter", values, "chapter_id = ?", new String[]{String.valueOf(chapter.getChapterId())});
-        db.close();
-        return rows > 0;
-    }
+//    public boolean updateChapter(Chapter chapter) {
+//        SQLiteDatabase db = dbHelper.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        values.put("book_id", chapter.getBookId());
+//        values.put("title", chapter.getTitle());
+//        values.put("start_page", chapter.getStartPage());
+//        values.put("end_page", chapter.getEndPage());
+//        int rows = db.update("Chapter", values, "chapter_id = ?", new String[]{String.valueOf(chapter.getChapterId())});
+//        db.close();
+//        return rows > 0;
+//    }
 
-    public Chapter getChapterById(int chapterId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM Chapter WHERE chapter_id = ?", new String[]{String.valueOf(chapterId)});
-        Chapter chapter = null;
-        if (cursor.moveToFirst()) {
-            chapter = new Chapter();
-            chapter.setChapterId(cursor.getInt(cursor.getColumnIndexOrThrow("chapter_id")));
-            chapter.setBookId(cursor.getInt(cursor.getColumnIndexOrThrow("book_id")));
-            chapter.setTitle(cursor.getString(cursor.getColumnIndexOrThrow("title")));
-            chapter.setStartPage(cursor.getInt(cursor.getColumnIndexOrThrow("start_page")));
-            chapter.setEndPage(cursor.getInt(cursor.getColumnIndexOrThrow("end_page")));
-        }
-        cursor.close();
-        db.close();
-        return chapter;
-    }
+//    public Chapter getChapterById(int chapterId) {
+//        SQLiteDatabase db = dbHelper.getReadableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT * FROM Chapter WHERE chapter_id = ?", new String[]{String.valueOf(chapterId)});
+//        Chapter chapter = null;
+//        if (cursor.moveToFirst()) {
+//            chapter = new Chapter();
+//            chapter.setChapterId(cursor.getInt(cursor.getColumnIndexOrThrow("chapter_id")));
+//            chapter.setBookId(cursor.getInt(cursor.getColumnIndexOrThrow("book_id")));
+//            chapter.setTitle(cursor.getString(cursor.getColumnIndexOrThrow("title")));
+//            chapter.setStartPage(cursor.getInt(cursor.getColumnIndexOrThrow("start_page")));
+//            chapter.setEndPage(cursor.getInt(cursor.getColumnIndexOrThrow("end_page")));
+//        }
+//        cursor.close();
+//        db.close();
+//        return chapter;
+//    }
     public ArrayList<Chapter> getChaptersByBookId(int bookId) {
         ArrayList<Chapter> chapters = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();

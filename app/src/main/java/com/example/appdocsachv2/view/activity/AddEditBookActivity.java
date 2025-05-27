@@ -48,6 +48,7 @@ public class AddEditBookActivity extends AppCompatActivity {
     private String selectedImagePath = "";
     private String selectedFilePath = "";
 
+    //Xử lý kết quả chọn ảnh, sao chép ảnh vào bộ nhớ ứng dụng và hiển thị bằng Glide
     private final ActivityResultLauncher<Intent> imagePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -63,6 +64,7 @@ public class AddEditBookActivity extends AppCompatActivity {
                 }
             });
 
+    //Xử lý kết quả chọn tệp PDF, sao chép vào bộ nhớ ứng dụng và cập nhật edtFilePath
     private final ActivityResultLauncher<Intent> filePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -105,6 +107,8 @@ public class AddEditBookActivity extends AppCompatActivity {
         // Lấy bookId từ Intent
         Intent intent = getIntent();
         bookId = intent.getIntExtra("book_id", -1);
+        //Nếu bookId != -1, tải dữ liệu sách và chương để chỉnh sửa
+        //Nếu bookId = -1, hiển thị chế độ thêm mới
         if (bookId != -1) {
             loadBookData(bookId);
             loadChaptersData(bookId);
@@ -144,19 +148,19 @@ public class AddEditBookActivity extends AppCompatActivity {
         btnEdit.setOnClickListener(v -> saveBookAndChapters());
 
     }
-
+//Mở dialog chọn ảnh từ thiết bị
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("image/*");
         imagePickerLauncher.launch(intent);
     }
-
+//Mở dialog chọn tệp PDF từ thiết bị
     private void openFilePicker() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("application/pdf");
         filePickerLauncher.launch(intent);
     }
-
+//Lấy phần mở rộng của file từ Uri (ví dụ: jpg, png)
     private String getFileExtension(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         String fileExtension = null;
@@ -173,7 +177,7 @@ public class AddEditBookActivity extends AppCompatActivity {
         }
         return fileExtension;
     }
-
+//Sao chép file từ Uri vào bộ nhớ ứng dụng
     private String copyFileToAppStorage(Uri uri, String subDir, String fileName) {
         try {
             File dir = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), subDir);
@@ -196,7 +200,7 @@ public class AddEditBookActivity extends AppCompatActivity {
             return null;
         }
     }
-
+//Thêm trường nhập liệu cho chương mới
     private void addChapterField() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View chapterView = inflater.inflate(R.layout.item_chapter_input, chapterContainer, false);
@@ -207,7 +211,7 @@ public class AddEditBookActivity extends AppCompatActivity {
         btnRemove.setOnClickListener(v -> chapterContainer.removeView(chapterView));
         chapterContainer.addView(chapterView);
     }
-
+    //Tải dữ liệu sách
     private void loadBookData(int bookId) {
         Book book = bookController.getBookById(bookId);
         if (book != null) {
@@ -225,6 +229,7 @@ public class AddEditBookActivity extends AppCompatActivity {
         }
     }
 
+    //Tải dữ liệu sách và chương khi ở chế độ chỉnh sửa
     private void loadChaptersData(int bookId) {
         chapters.clear();
         chapters.addAll(chapterController.getChaptersByBookId(bookId));
@@ -233,7 +238,7 @@ public class AddEditBookActivity extends AppCompatActivity {
             addChapterFieldWithData(chapter);
         }
     }
-
+//tải dữ liệu chương hiện có
     private void addChapterFieldWithData(Chapter chapter) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View chapterView = inflater.inflate(R.layout.item_chapter_input, chapterContainer, false);
@@ -254,6 +259,7 @@ public class AddEditBookActivity extends AppCompatActivity {
         chapterContainer.addView(chapterView);
     }
 
+    //Lưu thông tin sách và chương vào cơ sở dữ liệu
     private void saveBookAndChapters() {
         String title = edtTitle.getText().toString().trim();
         String author = edtAuthor.getText().toString().trim();
@@ -266,7 +272,10 @@ public class AddEditBookActivity extends AppCompatActivity {
             Toast.makeText(this, "Vui lòng nhập tiêu đề và chọn file PDF", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        if (author.isEmpty() || genre.isEmpty() || summary.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin tác giả, thể loại và tóm tắt", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (title.length() > 100 || author.length() > 50 || summary.length() < 10) {
             Toast.makeText(this, "Kiểm tra độ dài tiêu đề, tác giả, hoặc mô tả", Toast.LENGTH_SHORT).show();
             return;
@@ -311,6 +320,19 @@ public class AddEditBookActivity extends AppCompatActivity {
                     chapters.add(new Chapter(bookId, chapterTitle, startPage, endPage));
                 } catch (NumberFormatException e) {
                     Toast.makeText(this, "Trang không hợp lệ cho chương " + (i + 1), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
+
+        // Kiểm tra trùng lặp chương
+        for (int i = 0; i < chapters.size(); i++) {
+            for (int j = i + 1; j < chapters.size(); j++) {
+                Chapter chapterI = chapters.get(i);
+                Chapter chapterJ = chapters.get(j);
+                if ((chapterI.getStartPage() <= chapterJ.getEndPage() && chapterI.getEndPage() >= chapterJ.getStartPage()) ||
+                        (chapterJ.getStartPage() <= chapterI.getEndPage() && chapterJ.getEndPage() >= chapterI.getStartPage())) {
+                    Toast.makeText(this, "Chương " + (i + 1) + " và " + (j + 1) + " bị trùng lặp", Toast.LENGTH_SHORT).show();
                     return;
                 }
             }

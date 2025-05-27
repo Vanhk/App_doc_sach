@@ -13,7 +13,7 @@ import com.example.appdocsachv2.R;
 import com.example.appdocsachv2.utils.SessionManager;
 
 public class LoginActivity extends AppCompatActivity {
-    private static final String TAG = "LoginActivity";
+//    private static final String TAG = "LoginActivity";
     private EditText etUsername, etPassword;
     private Button btnLogin, btnregister;
     private SessionManager sessionManager;

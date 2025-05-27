@@ -42,11 +42,14 @@ public class MainActivity extends AppCompatActivity {
                 if (sessionManager.isLoggedIn()) {
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    //FLAG_ACTIVITY_NEW_TASK: Bắt đầu Activity mới như một tác vụ mới,
+                    // FLAG_ACTIVITY_CLEAR_TASK: Xóa tất cả các Activity trước đó trong stack, đảm bảo chỉ còn HomeActivity.
                     startActivity(intent);
                     finish();
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
+                    //Chuyển sang LoginActivity mà không xóa stack (người dùng có thể quay lại)
                 }
             }
         });

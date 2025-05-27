@@ -8,7 +8,8 @@ import com.example.appdocsachv2.database.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-
+//•	Đây là lớp chịu trách nhiệm thực hiện các thao tác CRUD (Create, Read, Update, Delete)
+// trên bảng Book trong cơ sở dữ liệu.
 public class BookDAO {
     private DatabaseHelper dbHelper;
     private Context context;
@@ -21,8 +22,8 @@ public class BookDAO {
         return context;
 }
     public long insertBook(Book book) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();//mở csdl cho phép thêm sửa xóa
+        ContentValues values = new ContentValues();//chèn dl vào bảng
         values.put("title", book.getTitle());
         values.put("author", book.getAuthor());
         values.put("genre", book.getGenre());
@@ -30,7 +31,7 @@ public class BookDAO {
         values.put("cover_image", book.getCoverImage());
         values.put("total_pages", book.getTotal_pages());
         values.put("summary", book.getSummary());
-        long id = db.insert("Book", null, values);
+        long id = db.insert("Book", null, values);//thêm một hàng vào bảng
         db.close();
         return id;
     }
@@ -52,7 +53,7 @@ public class BookDAO {
     // Lấy tất cả sách
     public List<Book> getAllBooks() {
         List<Book> books = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();//mở csdl ở chế độ đọc
         Cursor cursor = db.rawQuery("SELECT * FROM Book", null);
         if (cursor.moveToFirst()) {
             do {
@@ -66,7 +67,7 @@ public class BookDAO {
                 book.setTotal_pages(cursor.getInt(cursor.getColumnIndexOrThrow("total_pages")));
                 book.setSummary(cursor.getString(cursor.getColumnIndexOrThrow("summary")));
                 books.add(book);
-            } while (cursor.moveToNext());
+            } while (cursor.moveToNext());//lăpj qua tất cả các hnagf
         }
         cursor.close();
         db.close();

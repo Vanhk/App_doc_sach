@@ -114,7 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(CREATE_TABLE_CHAPTER);
             db.execSQL(CREATE_TABLE_FAVORITE_BOOK);
             db.execSQL(CREATE_TABLE_READING_PROGRESS);
-
+            //cursor cho phép lấy dữ liệu từ bảng,kiểm tra xem có tk admin trong bảng user ko
             Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_USER + " WHERE " + COLUMN_USERNAME + " = ?", new String[]{"admin"});
             if (cursor != null) {
                 if (cursor.moveToFirst() && cursor.getInt(0) == 0) {
@@ -124,7 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     values.put(COLUMN_EMAIL, "admin@example.com");
                     db.insert(TABLE_USER, null, values);
                 }
-                cursor.close();
+                cursor.close();//đóng cursor khi không dùng
             }
         } catch (SQLiteException e) {
         }

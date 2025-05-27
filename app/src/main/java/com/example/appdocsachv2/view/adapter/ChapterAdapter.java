@@ -14,7 +14,7 @@ import java.util.List;
 public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterViewHolder> {
     private List<Chapter> chapterList;
     private OnItemClickListener listener;
-    private int selectedPosition = -1;
+    private int selectedPosition = -1;//không có chương nào đc chọn
 
     public interface OnItemClickListener {
         void onItemClick(Chapter chapter);
@@ -31,7 +31,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chapter, parent, false);
         return new ChapterViewHolder(view);
     }
-
+//Lấy đối tượng Chapter tại vị trí position từ chapterList
     @Override
     public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
         Chapter chapter = chapterList.get(position);
@@ -44,8 +44,13 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
     }
 
     public void setSelectedPosition(int position) {
+        if (selectedPosition != -1) {
+            notifyItemChanged(selectedPosition); // Cập nhật item cũ
+        }
         selectedPosition = position;
-        notifyDataSetChanged(); // Cập nhật giao diện khi thay đổi vị trí chọn
+        if (selectedPosition != -1) {
+            notifyItemChanged(selectedPosition); // Cập nhật item mới
+        }
     }
 
     public static class ChapterViewHolder extends RecyclerView.ViewHolder {
@@ -60,8 +65,10 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
             txtChapterTitle.setText(chapter.getTitle());
             if (isSelected) {
                 itemView.setBackgroundResource(R.drawable.selected_item_background);
+                txtChapterTitle.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.white));
             } else {
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
+                txtChapterTitle.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
             }
             itemView.setOnClickListener(v -> {
                 if (listener != null) {

@@ -51,6 +51,7 @@ public class ChapterListActivity extends AppCompatActivity {
     public static final String ACTION_FAVORITE_CHANGED = "com.example.appdocsachv2.FAVORITE_CHANGED";
     public static final String EXTRA_BOOK_ID = "book_id";
 
+//Lắng nghe thay đổi trạng thái yêu thích từ các Activity khác và cập nhật giao diện.
     private BroadcastReceiver favoriteChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -92,7 +93,7 @@ public class ChapterListActivity extends AppCompatActivity {
             return;
         }
 
-        // Đăng ký BroadcastReceiver
+        // Đăng ký BroadcastReceiver để nhận thông báo thay đổi yêu thích
         LocalBroadcastManager.getInstance(this).registerReceiver(favoriteChangeReceiver,
                 new IntentFilter(ACTION_FAVORITE_CHANGED));
 
@@ -113,12 +114,14 @@ public class ChapterListActivity extends AppCompatActivity {
         chapterList = new ArrayList<>();
         bookId = getIntent().getIntExtra("book_id", -1);
         if (bookId != -1) {
+            //Lấy danh sách chương từ chapterController
             chapterList.addAll(chapterController.getChaptersByBookId(bookId));
+            //Lấy thông tin sách từ bookController để lấy totalPages và coverImage
             Book book = bookController.getBookById(bookId);
             if (book != null) {
                 totalPages = book.getTotal_pages();
                 String coverImage = book.getCoverImage();
-                if (coverImage != null && !coverImage.isEmpty()) {
+                if (coverImage != null && !coverImage.isEmpty()) {//Nếu coverImage tồn tại và là file, decode thành Bitmap
                     File coverFile = new File(coverImage);
                     if (coverFile.exists()) {
                         Bitmap bitmap = BitmapFactory.decodeFile(coverFile.getAbsolutePath());
@@ -155,7 +158,7 @@ public class ChapterListActivity extends AppCompatActivity {
                 btnBookMark.setImageResource(isBookmarked ? R.drawable.baseline_bookmark_24 : R.drawable.icon_ionic_ios_bookmark);
             }
         }
-
+//Nếu không có chương, chuyển ngay đến ReadBookActivity với toàn bộ trang
         if (chapterList.isEmpty()) {
             Intent intent = new Intent(ChapterListActivity.this, ReadBookActivity.class);
             intent.putExtra("book_id", bookId);
@@ -170,13 +173,13 @@ public class ChapterListActivity extends AppCompatActivity {
             finish();
             return;
         }
-
+//hiển thị ds chương
         chapterAdapter = new ChapterAdapter(chapterList, this::onChapterClick);
         recyclerViewChapters.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewChapters.setAdapter(chapterAdapter);
 
         btnQuaylai.setOnClickListener(v -> onBackPressed());
-
+//Kiểm tra trạng thái yêu thích từ SharedPreferences
         btnBookMark.setOnClickListener(v -> {
             String favoriteIds = sharedPreferences.getString(FAVORITES_KEY + userId, "");
             List<String> favoriteBookIdsList = new ArrayList<>();
@@ -186,20 +189,20 @@ public class ChapterListActivity extends AppCompatActivity {
             boolean isBookmarked = favoriteBookIdsList.contains(String.valueOf(bookId));
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            if (isBookmarked) {
+            if (isBookmarked) {//Nếu đã yêu thích, xóa và đổi biểu tượng
                 favoriteBookIdsList.remove(String.valueOf(bookId));
                 editor.putString(FAVORITES_KEY + userId, String.join(",", favoriteBookIdsList));
                 editor.apply();
                 btnBookMark.setImageResource(R.drawable.icon_ionic_ios_bookmark);
                 Toast.makeText(this, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
-            } else {
+            } else {//nếu chưa, thêm và đổi biểu tượng
                 favoriteBookIdsList.add(String.valueOf(bookId));
                 editor.putString(FAVORITES_KEY + userId, String.join(",", favoriteBookIdsList));
                 editor.apply();
                 btnBookMark.setImageResource(R.drawable.baseline_bookmark_24);
                 Toast.makeText(this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
             }
-
+            //Gửi broadcast để thông báo thay đổi
             Intent broadcastIntent = new Intent(ACTION_FAVORITE_CHANGED);
             broadcastIntent.putExtra(EXTRA_BOOK_ID, bookId);
             LocalBroadcastManager.getInstance(ChapterListActivity.this).sendBroadcast(broadcastIntent);
@@ -216,7 +219,8 @@ public class ChapterListActivity extends AppCompatActivity {
             int startPage;
             int endPage;
             String chapterTitle;
-
+//Nếu có chương được chọn (selectedChapterPosition >= 0),
+// lấy startPage, endPage, và chapterTitle từ chương đó
             if (selectedChapterPosition >= 0 && selectedChapterPosition < chapterList.size()) {
                 Chapter chapter = chapterList.get(selectedChapterPosition);
                 startPage = safePageIndex(chapter.getStartPage());
@@ -235,14 +239,14 @@ public class ChapterListActivity extends AppCompatActivity {
         });
     }
 
-
+//Cập nhật vị trí chương được chọn và kích hoạt nút "Đọc"
     private void onChapterClick(Chapter chapter) {
         selectedChapterPosition = chapterList.indexOf(chapter);
         chapterAdapter.setSelectedPosition(selectedChapterPosition);
         Button btnDoc = findViewById(R.id.button2);
         btnDoc.setEnabled(true);
     }
-
+//Đảm bảo trang không vượt quá giới hạn của totalPages
     private int safePageIndex(int page) {
         if (totalPages <= 0) return 0;
         return Math.max(0, Math.min(page, totalPages - 1));

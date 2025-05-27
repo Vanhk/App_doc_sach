@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
-    private static final String TAG = "HomeActivity";
+//    private static final String TAG = "HomeActivity";
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private RecyclerView recyclerMyBooks, recyclerReadingProgress, recyclerMyFavoriteBooks;
@@ -81,6 +81,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Khởi tạo SessionManager
         sessionManager = new SessionManager(this);
+        //kiểm tra đăng nhập
         if (!sessionManager.isLoggedIn()) {
             Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -92,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home);
 
-        // Đăng ký BroadcastReceiver
+        //Đăng ký favoriteChangeReceiver để lắng nghe sự kiện thay đổi danh sách yêu thích từ ChapterListActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(favoriteChangeReceiver,
                 new IntentFilter(ChapterListActivity.ACTION_FAVORITE_CHANGED));
 
@@ -124,6 +125,8 @@ public class HomeActivity extends AppCompatActivity {
         searchBar.setAdapter(suggestionAdapter);
 
         // Cấu hình RecyclerView
+        //Thiết lập LinearLayoutManager với hướng ngang (HORIZONTAL) cho 3 RecyclerView
+        //Danh sách dữ liệu tương ứng (filteredMyBooksList, readingProgressList, favoriteBooksList)
         LinearLayoutManager myBooksLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerMyBooks.setLayoutManager(myBooksLayoutManager);
         myBooksAdapter = new BookAdapter(filteredMyBooksList, book -> {
@@ -161,10 +164,10 @@ public class HomeActivity extends AppCompatActivity {
         recyclerMyFavoriteBooks.setAdapter(favoriteBooksAdapter);
 
         // Xử lý tìm kiếm trong searchBar
+        //hiển thị kết quả trong recycler view my book
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String keyword = s.toString().toLowerCase();
@@ -180,7 +183,6 @@ public class HomeActivity extends AppCompatActivity {
                 filteredMyBooksList.addAll(filteredBooks);
                 myBooksAdapter.updateData(filteredMyBooksList);
             }
-
             @Override
             public void afterTextChanged(Editable s) {}
         });
@@ -216,6 +218,8 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         // Sự kiện nút Thêm sách
+        //chuyển đến AddEditBookActivity với book_id = -1 (thêm sách mới)
+        //sử dụng activityResultLauncher để xử lý kết quả trả về
         btAddHome.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, AddEditBookActivity.class);
             intent.putExtra("book_id", -1);
@@ -228,6 +232,7 @@ public class HomeActivity extends AppCompatActivity {
         TextView tvViewAllFavoriteBooks = findViewById(R.id.tvfavorite);
 
         // Sự kiện Xem tất cả
+        //Chuyển đến BookListActivity với các list_type tương ứng (my_books, reading_progress, favorite_books)
         tvViewAllMyBook.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, BookListActivity.class);
             intent.putExtra("list_type", "my_books");
@@ -250,15 +255,14 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Khởi tạo DrawerLayout và NavigationView
+        // Khởi tạo DrawerLayout và NavigationView để tạo menu điều hướng bên trái
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-
+        //Cấu hình ActionBarDrawerToggle để hiển thị nút hamburger trên Toolbar
         drawerToggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
-
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_my_books) {
@@ -286,7 +290,6 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else if (id == R.id.nav_settings) {
-                // Xử lý settings
             } else if (id == R.id.nav_about) {
                 StringBuilder aboutMessage = new StringBuilder();
                 aboutMessage.append("ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI\n");
@@ -315,7 +318,7 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         });
 
-        // Xử lý nút Back
+        // Xử lý nút Back khi muốn ra khỏi menu
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -356,7 +359,6 @@ public class HomeActivity extends AppCompatActivity {
         if (allBooks != null) {
             myBooksList.addAll(allBooks);
         }
-
         // Load Sách đọc dở
         readingProgressList.clear();
         List<ReadingProgress> progressList = readingProgressDAO.getReadingProgress(userId);
@@ -365,13 +367,10 @@ public class HomeActivity extends AppCompatActivity {
                 Book book = bookController.getBookById(progress.getBookId());
                 if (book != null) {
                     readingProgressList.add(book);
-                } else {
                 }
             }
-        } else {
         }
         readingProgressAdapter.updateData(readingProgressList);
-
         // Load Sách yêu thích
         favoriteBooksList.clear();
         List<Integer> favoriteBookIds = getFavoriteBookIds();
@@ -384,18 +383,15 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         favoriteBooksAdapter.updateData(favoriteBooksList);
-
-        // Cập nhật danh sách gợi ý
+        // Cập nhật danh sách gợi ý tìm kiếm
         updateSuggestions();
         ArrayAdapter<String> suggestionAdapter = (ArrayAdapter<String>) searchBar.getAdapter();
         suggestionAdapter.clear();
         suggestionAdapter.addAll(suggestionList);
         suggestionAdapter.notifyDataSetChanged();
-
-        // Lọc sách theo thể loại
-        filterBooksByGenre();
+        filterBooksByGenre();// Lọc sách theo thể loại
     }
-
+// xử lý chọn theer loại ở my book
     private void setupGenreFilters() {
         // Lấy danh sách thể loại duy nhất từ bảng Book
         Set<String> genresSet = new HashSet<>();
@@ -412,7 +408,7 @@ public class HomeActivity extends AppCompatActivity {
         genreFilterContainer.removeAllViews();
         genreButtons.clear();
 
-        // Tạo nút cho từng thể loại
+        // Tạo các nút Button cho từng thể loại, thêm vào genreFilterContainer
         for (String genre : genres) {
             Button genreButton = new Button(this);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -433,8 +429,7 @@ public class HomeActivity extends AppCompatActivity {
             if (genre.equals(selectedGenre)) {
                 genreButton.setBackgroundTintList(ContextCompat.getColorStateList(this,R.color.blue_dam));
             }
-
-            // Thiết lập sự kiện nhấn
+            // Khi nhấn nút, cập nhật selectedGenre và gọi filterBooksByGenre() để lọc sách
             genreButton.setOnClickListener(v -> {
                 selectedGenre = genre;
                 // Cập nhật màu nền của tất cả các nút
@@ -449,7 +444,7 @@ public class HomeActivity extends AppCompatActivity {
             genreFilterContainer.addView(genreButton);
         }
     }
-
+//xử lý lấy danh sách thể loại tương ứng
     private void filterBooksByGenre() {
         filteredMyBooksList.clear();
         String keyword = searchBar.getText().toString().trim().toLowerCase();
@@ -465,7 +460,7 @@ public class HomeActivity extends AppCompatActivity {
         }
         myBooksAdapter.updateData(filteredMyBooksList);
     }
-
+//tạo danh sách gợi ý tìm kiếm dựa trên thông tin sách
     private void updateSuggestions() {
         suggestionList.clear();
         Set<String> suggestions = new HashSet<>();
@@ -486,7 +481,7 @@ public class HomeActivity extends AppCompatActivity {
         suggestionList.addAll(suggestions);
         Collections.sort(suggestionList);
     }
-
+//Lấy danh sách ID của sách yêu thích từ SharedPreferences
     public List<Integer> getFavoriteBookIds() {
         String favoriteIds = sharedPreferences.getString("favorite_book_ids_user_" + userId, "");
         if (favoriteIds.isEmpty()) {
@@ -502,27 +497,25 @@ public class HomeActivity extends AppCompatActivity {
         }
         return bookIds;
     }
-
+//thêm 1 sách vào ds yêu thích
     public void addToFavorites(int bookId) {
         List<Integer> favoriteBookIds = getFavoriteBookIds();
         if (!favoriteBookIds.contains(bookId)) {
             favoriteBookIds.add(bookId);
             saveFavoriteBookIds(favoriteBookIds);
             loadData();
-        } else {
         }
     }
-
+    //xóa 1 sách khỏi ds yêu thích
     public void removeFromFavorites(int bookId) {
         List<Integer> favoriteBookIds = getFavoriteBookIds();
         if (favoriteBookIds.contains(bookId)) {
             favoriteBookIds.remove(Integer.valueOf(bookId));
             saveFavoriteBookIds(favoriteBookIds);
             loadData();
-        } else {
         }
     }
-
+//Lưu danh sách ID sách yêu thích vào SharedPreferences
     private void saveFavoriteBookIds(List<Integer> bookIds) {
         String ids = android.text.TextUtils.join(",", bookIds);
         sharedPreferences.edit().putString("favorite_book_ids_user_" + userId, ids).apply();

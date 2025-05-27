@@ -59,6 +59,7 @@ public class BookListActivity extends AppCompatActivity {
 
         // Khởi tạo SessionManager
         sessionManager = new SessionManager(this);
+        //kiểm tra đăng nhập
         userId = getIntent().getIntExtra("user_id", sessionManager.getUserId());
         if (userId == -1) {
             Intent intent = new Intent(BookListActivity.this, LoginActivity.class);
@@ -85,7 +86,7 @@ public class BookListActivity extends AppCompatActivity {
         filteredBookList = new ArrayList<>();
         suggestionList = new ArrayList<>();
 
-        // Thiết lập GridLayoutManager với 3 cột
+        // Thiết lập GridLayoutManager với 3 cột để hiển thị sách dạng lưới
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerViewBooks.setLayoutManager(gridLayoutManager);
 
@@ -97,6 +98,7 @@ public class BookListActivity extends AppCompatActivity {
 
         // Xác định xem có hiển thị icon yêu thích hay không
         boolean showFavoriteIcon = !listType.equals("my_books");
+        //Khi nhấn vào sách, chuyển hướng đến BookDetailActivity
         bookAdapter = new BookAdapter(filteredBookList, book -> {
             Intent intent = new Intent(BookListActivity.this, BookDetailActivity.class);
             intent.putExtra("book_id", book.getBookId());
@@ -137,10 +139,12 @@ public class BookListActivity extends AppCompatActivity {
         // Điều chỉnh giao diện dựa trên fromSearch
         if (fromSearch) {
             searchBar.setVisibility(View.VISIBLE);
+            //hiển thị searchBar, ẩn Spinner, và đặt từ khóa tìm kiếm ban đầu.
             spinnerAuthor.setVisibility(View.GONE);
             spinnerGenre.setVisibility(View.GONE);
             searchBar.setText(searchKeyword != null ? searchKeyword : "");
         } else {
+            //hiển thị Spinner và ẩn searchBar
             searchBar.setVisibility(View.GONE);
             spinnerAuthor.setVisibility(View.VISIBLE);
             spinnerGenre.setVisibility(View.VISIBLE);
@@ -161,11 +165,9 @@ public class BookListActivity extends AppCompatActivity {
                 String keyword = s.toString().trim();
                 filterBooks(keyword);
             }
-
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
         // Xử lý khi chọn gợi ý
         searchBar.setOnItemClickListener((parent, view, position, id) -> {
             String selectedSuggestion = (String) parent.getItemAtPosition(position);
@@ -173,7 +175,7 @@ public class BookListActivity extends AppCompatActivity {
             filterBooks(selectedSuggestion);
         });
 
-        // Xử lý sự kiện chọn Author
+        // Xử lý sự kiện chọn loc theo Author
         spinnerAuthor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -188,7 +190,7 @@ public class BookListActivity extends AppCompatActivity {
             }
         });
 
-        // Xử lý sự kiện chọn Genre
+        // Xử lý sự kiện chọn lọc theo Genre
         spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -202,7 +204,7 @@ public class BookListActivity extends AppCompatActivity {
                 filterBooks();
             }
         });
-
+// nút quay lại
         btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(BookListActivity.this, HomeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -210,7 +212,7 @@ public class BookListActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
-
+// nút thêm sách
         btnAddBook.setOnClickListener(v -> {
             Intent intent = new Intent(BookListActivity.this, AddEditBookActivity.class);
             intent.putExtra("book_id", -1);
@@ -279,7 +281,7 @@ public class BookListActivity extends AppCompatActivity {
             spinnerGenre.setSelection(0);
         }
 
-        // Cập nhật danh sách gợi ý
+        // Cập nhật danh sách gợi ý tìm kiếm
         updateSuggestions();
         ArrayAdapter<String> suggestionAdapter = (ArrayAdapter<String>) searchBar.getAdapter();
         suggestionAdapter.clear();
@@ -288,7 +290,7 @@ public class BookListActivity extends AppCompatActivity {
 
         filterBooks();
     }
-
+    //tạo danh sách gợi ý tìm kiếm dựa trên thông tin sách
     private void updateSuggestions() {
         suggestionList.clear();
         Set<String> suggestions = new HashSet<>();
@@ -309,7 +311,7 @@ public class BookListActivity extends AppCompatActivity {
         suggestionList.addAll(suggestions);
         Collections.sort(suggestionList);
     }
-
+//tạo ds tác giả
     private List<String> getUniqueAuthors() {
         Set<String> authorsSet = new HashSet<>();
         authorsSet.add("All");
@@ -322,7 +324,7 @@ public class BookListActivity extends AppCompatActivity {
         Collections.sort(authors);
         return authors;
     }
-
+//tạo ds thể loại
     private List<String> getUniqueGenres() {
         Set<String> genresSet = new HashSet<>();
         genresSet.add("All");
@@ -342,7 +344,7 @@ public class BookListActivity extends AppCompatActivity {
     private void filterBooks() {
         filterBooks(searchBar.getText().toString().trim());
     }
-
+//Lọc sách từ bookList dựa trên tác giả, thể loại, và từ khóa tìm kiếm
     private void filterBooks(String searchQuery) {
         filteredBookList.clear();
         for (Book book : bookList) {
@@ -358,7 +360,7 @@ public class BookListActivity extends AppCompatActivity {
         }
         bookAdapter.updateData(filteredBookList);
     }
-
+//Lấy danh sách ID của sách yêu thích từ SharedPreferences
     public List<Integer> getFavoriteBookIds() {
         SharedPreferences sharedPreferences = getSharedPreferences("Favorites", MODE_PRIVATE);
         String favoriteIds = sharedPreferences.getString("favorite_book_ids_user_" + userId, "");
@@ -375,7 +377,7 @@ public class BookListActivity extends AppCompatActivity {
         }
         return bookIds;
     }
-
+//thêm 1 sách vào ds yêu thích
     public void addToFavorites(int bookId) {
         List<Integer> favoriteBookIds = getFavoriteBookIds();
         if (!favoriteBookIds.contains(bookId)) {
@@ -384,7 +386,7 @@ public class BookListActivity extends AppCompatActivity {
             loadBooks();
         }
     }
-
+    //xóa 1 sách khỏi ds yêu thích
     public void removeFromFavorites(int bookId) {
         List<Integer> favoriteBookIds = getFavoriteBookIds();
         if (favoriteBookIds.contains(bookId)) {
@@ -393,7 +395,7 @@ public class BookListActivity extends AppCompatActivity {
             loadBooks();
         }
     }
-
+//Lưu danh sách ID sách yêu thích vào SharedPreferences
     private void saveFavoriteBookIds(List<Integer> bookIds) {
         SharedPreferences sharedPreferences = getSharedPreferences("Favorites", MODE_PRIVATE);
         String ids = android.text.TextUtils.join(",", bookIds);

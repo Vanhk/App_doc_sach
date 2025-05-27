@@ -41,12 +41,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         void onItemClick(Book book);
     }
 
-    public BookAdapter(List<Book> bookList, OnItemClickListener listener, Context context) {
-        this.bookList = bookList;
-        this.listener = listener;
-        this.showFavoriteIcon = false;
-        this.context = context;
-    }
+//    public BookAdapter(List<Book> bookList, OnItemClickListener listener, Context context) {
+//        this.bookList = bookList;
+//        this.listener = listener;
+//        this.showFavoriteIcon = false;
+//        this.context = context;
+//    }
 
     public BookAdapter(List<Book> bookList, OnItemClickListener listener, HomeActivity homeActivity, boolean showFavoriteIcon, BookController bookController, int userId) {
         this.bookList = bookList;
@@ -77,19 +77,19 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         this.bookController = bookController;
         this.userId = userId;
     }
-
+    //Cập nhật danh sách sách và làm mới RecyclerView
     public void updateData(List<Book> newBooks) {
         this.bookList = newBooks;
         notifyDataSetChanged();
     }
-
+    //Tạo mới một ViewHolder cho item sách
     @NonNull
     @Override
     public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_book, parent, false);
         return new BookViewHolder(view);
     }
-
+    //Gán dữ liệu sách vào ViewHolder tại vị trí position
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         if (bookList != null && position < bookList.size()) {
@@ -97,7 +97,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             holder.bind(book, listener);
         }
     }
-
+    //Trả về số lượng item trong RecyclerView
     @Override
     public int getItemCount() {
         int count = bookList != null ? bookList.size() : 0;
@@ -141,9 +141,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
                 intent.putExtra("book_id", book.getBookId());
                 context.startActivity(intent);
             };
+            //mở bookdetail khi click
             imgBookCover.setOnClickListener(openDetail);
             txtBookTitle.setOnClickListener(openDetail);
-
+            //nếu showFavoriteIcon = true Ẩn btnEdit và btnDelete, hiển thị btnFavorite
             if (showFavoriteIcon) {
                 btnEdit.setVisibility(View.GONE);
                 btnDelete.setVisibility(View.GONE);
@@ -206,17 +207,17 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
                 } else {
                     btnFavorite.setImageResource(R.drawable.icon_ionic_ios_bookmark);
                 }
-            } else {
+            } else {//Hiển thị btnEdit và btnDelete, ẩn btnFavorite
                 btnEdit.setVisibility(View.VISIBLE);
                 btnDelete.setVisibility(View.VISIBLE);
                 btnFavorite.setVisibility(View.GONE);
-
+                //mở addeditactivity
                 btnEdit.setOnClickListener(v -> {
                     Intent intent = new Intent(context, AddEditBookActivity.class);
                     intent.putExtra("book_id", book.getBookId());
                     context.startActivity(intent);
                 });
-
+                //nút xóa
                 btnDelete.setOnClickListener(v -> {
                     new AlertDialog.Builder(context)
                             .setTitle("Xác nhận xóa")
